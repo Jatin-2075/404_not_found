@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import Layout from "./Components/Layout.jsx";
+import Layout from "./Components/Layout";
 
 import Home from "./Pages/Home";
 import Dashboard from "./Pages/Dashboard";
