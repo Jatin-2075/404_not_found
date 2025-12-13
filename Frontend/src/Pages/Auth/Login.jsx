@@ -12,7 +12,7 @@ const Login = () => {
     const res = await fetch("http://127.0.0.1:8000/login/", {
       method: "POST",
       body: form,
-      credentials: "include", // session auth
+      credentials: "include",
     });
 
     const data = await res.json();
