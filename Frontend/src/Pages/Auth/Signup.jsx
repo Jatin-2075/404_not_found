@@ -1,58 +1,51 @@
 import { useState } from "react";
-import api from "../../Auth/api";
-import { NavLink } from "react-router";
-import "../../Style/signup.css";
 
-function Signup() {
-    const [email, setEmail] = useState("");
-    const [username, setUser] = useState("");
-    const [password, setPass] = useState("");
+const Signup = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    const submit = async () => {
-        await api.post("/api/user/register", { email, username, password });
-        alert("Registered!");
-    };
+  const HandleSubmit = async () => {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
-    return (
-        <div className="signup-container">
+    const form = new FormData();
+    form.append("username", username);
+    form.append("email", email);
+    form.append("password", password);
 
-            <h2>Create Account</h2>
+    const res = await fetch("http://127.0.0.1:8000/signup/", {
+      method: "POST",
+      body: form,
+    });
 
-            <div className="signup-field">
-                <label>Email</label>
-                <input
-                    placeholder="Enter your email"
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-            </div>
+    const data = await res.json();
+    alert(data.msg);
+  };
 
-            <div className="signup-field">
-                <label>Username*</label>
-                <input
-                    placeholder="Enter your username"
-                    onChange={(e) => setUser(e.target.value)}
-                />
-            </div>
+  return (
+    <div>
+      <h1>Skillsync</h1>
+      <h3>Signup page</h3>
 
-            <div className="signup-field">
-                <label>Password*</label>
-                <input
-                    placeholder="Enter password"
-                    type="password"
-                    onChange={(e) => setPass(e.target.value)}
-                />
-            </div>
+      <label>Username</label>
+      <input onChange={(e) => setUsername(e.target.value)} />
 
-            <button className="signup-btn" onClick={submit}>
-                Register
-            </button>
+      <label>Email</label>
+      <input onChange={(e) => setEmail(e.target.value)} />
 
-            <div className="signup-login-text">
-                <p>Already have an account?</p>
-                <NavLink to="/Login">Login</NavLink>
-            </div>
-        </div>
-    );
-}
+      <label>Password</label>
+      <input type="password" onChange={(e) => setPassword(e.target.value)} />
+
+      <label>Confirm Password</label>
+      <input type="password" onChange={(e) => setConfirmPassword(e.target.value)} />
+
+      <button onClick={HandleSubmit}>Submit</button>
+    </div>
+  );
+};
 
 export default Signup;

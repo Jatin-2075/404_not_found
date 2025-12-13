@@ -1,53 +1,44 @@
 import { useState } from "react";
-import api from "../../Auth/api";
-import { useAuth } from "../../Auth/AuthContext";
-import { NavLink } from "react-router";
-import "../../Style/login.css";
 
-function Login() {
-    const { login } = useAuth();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    const submit = async () => {
-        const res = await api.post("/api/token/", { username, password });
-        login(res.data.access);
-        window.location.href = "/dashboard";
-    };
+  const HandleSubmit = async () => {
+    const form = new FormData();
+    form.append("username", username);
+    form.append("password", password);
 
-    return (
-        <div className="login-container">
+    const res = await fetch("http://127.0.0.1:8000/login/", {
+      method: "POST",
+      body: form,
+      credentials: "include", // session auth
+    });
 
-            <h2>Login</h2>
+    const data = await res.json();
 
-            <div className="login-field">
-                <label>Email</label>
-                <input
-                    placeholder="Enter your username"
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-            </div>
+    if (data.success) {
+      alert("Logged in");
+      window.location.href = "/dashboard";
+    } else {
+      alert(data.msg);
+    }
+  };
 
-            <div className="login-field">
-                <label>Password</label>
-                <input
-                    type="password"
-                    placeholder="Enter password"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-            </div>
+  return (
+    <div>
+      <h1>Skillsync</h1>
+      <h3>Login page</h3>
 
-            <button className="login-btn" onClick={submit}>
-                Login
-            </button>
+      <label>Username</label>
+      <input onChange={(e) => setUsername(e.target.value)} />
 
-            <div className="login-footer">
-                <p>New User?</p>
-                <NavLink to="/Signup">Signup</NavLink>
-            </div>
+      <label>Password</label>
+      <input type="password" onChange={(e) => setPassword(e.target.value)} />
 
-        </div>
-    );
-}
+      <button onClick={HandleSubmit}>Submit</button>
+    </div>
+  );
+};
 
 export default Login;
