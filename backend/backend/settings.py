@@ -18,6 +18,8 @@ INSTALLED_APPS = [
     "django.contrib.sites",
 
     "APIAUTH",
+    "Login_Signup",
+    "ML_Model",
 
     "corsheaders",
     "rest_framework",
