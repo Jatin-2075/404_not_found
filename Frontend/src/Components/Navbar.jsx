@@ -1,67 +1,44 @@
 import { NavLink } from "react-router-dom";
-import "../Style/navbar.css";
-import useWindowWidth from "../Hooks/Width";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import "../Style/Navbar.css";
 
 const Navbar = () => {
-    const [toggle, setToggle] = useState(true);
-    const [navToggle, setNavToggle] = useState(false);
+  const [open, setOpen] = useState(false);
 
-    const width = useWindowWidth();
+  return (
+    <header className="top-navbar">
+      <div className="nav-left">
+        <span className="logo">HealthApp</span>
+      </div>
 
-    // ✅ FIX 1: state update moved to useEffect
-    useEffect(() => {
-        if (width > 768) {
-            setToggle(true);
-            setNavToggle(false);
-        } else {
-            setToggle(false);
-        }
-    }, [width]);
+      <nav className={`nav-center ${open ? "open" : ""}`}>
+        <NavLink to="/Dashboard" className="nav-item">
+          Dashboard
+        </NavLink>
+        <NavLink to="/Upload" className="nav-item">
+          Upload
+        </NavLink>
+        <NavLink to="/Reports" className="nav-item">
+          Reports
+        </NavLink>
+        <NavLink to="/SmartHelper" className="nav-item">
+          Smart Helper
+        </NavLink>
+      </nav>
 
-    return (
-        <aside className="sidebar">
-            <div className="logo">
-                <span>SmartZen</span>
-            </div>
+      <div className="nav-right">
+        <button className="icon-btn">⚙</button>
+        <div className="avatar">👤</div>
 
-            {toggle ? (
-                <>
-                    {!navToggle && (
-                        <button type="button" onClick={() => setNavToggle(true)}>
-                            ☰
-                        </button>
-                    )}
-
-                    {navToggle && (
-                        <>
-                            <button type="button" onClick={() => setNavToggle(false)}>
-                                ✖
-                            </button>
-
-                            <nav className="menu">
-                                <NavLink to="/Home" className="item">Home</NavLink>
-                                <NavLink to="/Dashboard" className="item">Dashboard</NavLink>
-                                <NavLink to="/Upload" className="item">Uploads</NavLink>
-                                <NavLink to="/Reports" className="item">Medical Reports</NavLink>
-                                <NavLink to="/SmartHelper" className="item">Smart Helper</NavLink>
-                                <NavLink to="/Help" className="item">Help</NavLink>
-                            </nav>
-                        </>
-                    )}
-                </>
-            ) : (
-                <nav className="menu">
-                    <NavLink to="/Home" className="item">Home</NavLink>
-                    <NavLink to="/Dashboard" className="item">Dashboard</NavLink>
-                    <NavLink to="/Upload" className="item">Uploads</NavLink>
-                    <NavLink to="/Reports" className="item">Medical Reports</NavLink>
-                    <NavLink to="/SmartHelper" className="item">Smart Helper</NavLink>
-                    <NavLink to="/Help" className="item">Help</NavLink>
-                </nav>
-            )}
-        </aside>
-    );
+        <button
+          className="hamburger"
+          onClick={() => setOpen(!open)}
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+  );
 };
 
 export default Navbar;

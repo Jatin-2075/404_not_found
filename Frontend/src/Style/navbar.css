@@ -1,50 +1,108 @@
-.sidebar {
-  width: 240px;
-  height: 100vh;
+/* Container */
+.top-navbar {
+  height: 60px;
   background: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  padding: 24px 18px;
-
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-}
-
-
-.logo {
-  font-size: 1.2rem;
-  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 32px;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.menu {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.item {
-  text-decoration: none;
-  color: #374151;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: background 0.2s ease;
-}
-
-.item:hover {
-  background: #f3f4f6;
-}
-
-.item.active {
-  background: #e0ecff;
+/* Left */
+.logo {
+  font-size: 20px;
+  font-weight: 700;
   color: #2563eb;
-  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.logo:hover {
+  color: #0ea5e9;
+  
+}
+
+/* Center nav */
+.nav-center {
+  display: flex;
+  gap: 28px;
+}
+
+.nav-item {
+  text-decoration: none;
+  font-weight: 500;
+  color: #868686;
+  position: relative;
+}
+
+.nav-item.active {
+  color: #428ae1;
+}
+
+.nav-item.active::after {
+  content: "";
+  height: 2px;
+  width: 100%;
+  background: #3a6fe3;
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+}
+
+/* Right */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  background: #f3f4f6;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .nav-center {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: white;
+    flex-direction: column;
+    padding: 16px 0;
+    display: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .nav-center.open {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
 }
