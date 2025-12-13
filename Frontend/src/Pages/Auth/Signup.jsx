@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import "../../Style/signup.css";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const HandleSubmit = async () => {
-    if (!username || !email || !password) {
-      alert("All fields required");
+  const handleSubmit = async () => {
+    if (!username || !email || !password || !confirmPassword) {
+      alert("All fields are required");
       return;
     }
 
@@ -18,6 +21,8 @@ const Signup = () => {
     }
 
     try {
+      setLoading(true);
+
       const form = new FormData();
       form.append("username", username);
       form.append("email", email);
@@ -31,39 +36,77 @@ const Signup = () => {
       const data = await res.json();
 
       if (data.success) {
-        alert("Account created");
-        window.location.href = "/Login"; 
+        alert("Account created successfully");
+        window.location.href = "/Login";
       } else {
-        alert(data.msg);
+        alert(data.msg || "Signup failed");
       }
     } catch (err) {
-      alert("Server error");
+      alert("Server error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Skillsync</h1>
-      <h3>Signup page</h3>
+    <div className="signup-container">
+      <h2>SmartZen</h2>
 
-      <label>Username</label>
-      <input onChange={(e) => setUsername(e.target.value)} />
+      <div className="signup-field">
+        <label>Username</label>
+        <input
+          type="text"
+          placeholder="Choose a username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
 
-      <label>Email</label>
-      <input onChange={(e) => setEmail(e.target.value)} />
+      <div className="signup-field">
+        <label>Email</label>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
 
-      <label>Password</label>
-      <input type="password" onChange={(e) => setPassword(e.target.value)} />
+      <div className="signup-field">
+        <label>Password</label>
+        <input
+          type="password"
+          placeholder="Create a password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
 
-      <label>Confirm Password</label>
-      <input
-        type="password"
-        onChange={(e) => setConfirmPassword(e.target.value)}
-      />
+      <div className="signup-field">
+        <label>Confirm Password</label>
+        <input
+          type="password"
+          placeholder="Re-enter password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+      </div>
 
-      <button onClick={HandleSubmit}>Submit</button>
+      <button
+        className="signup-btn"
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? "Creating account..." : "Sign Up"}
+      </button>
+
+      <p className="signup-login-text">
+        Already have an account?{" "}
+        <NavLink to="/Login">Login</NavLink>
+      </p>
     </div>
   );
+
 };
 
 export default Signup;

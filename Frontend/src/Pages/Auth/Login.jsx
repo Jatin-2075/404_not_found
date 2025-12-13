@@ -1,14 +1,19 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import "../../Style/Login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const HandleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!username || !password) {
-      alert("All fields required");
+      alert("All fields are required");
       return;
     }
+
+    setLoading(true);
 
     try {
       const form = new FormData();
@@ -26,27 +31,40 @@ const Login = () => {
       if (data.success) {
         window.location.href = "/Dashboard";
       } else {
-        alert(data.msg);
+        alert(data.msg || "Invalid credentials");
       }
     } catch (err) {
       alert("Server error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Skillsync</h1>
-      <h3>Login page</h3>
+    <div className="login-page">
+      <div className="login-container">
+        <h2>SmartZen</h2>
+        <p className="login-subtitle">Welcome back 👋</p>
 
-      <label>Username</label>
-      <input onChange={(e) => setUsername(e.target.value)} />
+        <div className="login-field">
+          <label>Username</label>
+          <input type="text" />
+        </div>
 
-      <label>Password</label>
-      <input type="password" onChange={(e) => setPassword(e.target.value)} />
+        <div className="login-field">
+          <label>Password</label>
+          <input type="password" />
+        </div>
 
-      <button onClick={HandleSubmit}>Submit</button>
+        <button className="login-btn">Login</button>
+
+        <div className="login-footer">
+          Don't have an account? <a href="/Signup">Sign up</a>
+        </div>
+      </div>
     </div>
   );
+
 };
 
 export default Login;
