@@ -1,20 +1,46 @@
+/* ===============================
+   SIGNUP CONTAINER
+================================ */
 .signup-container {
-  width: 90%;
+  width: 92%;
   max-width: 420px;
-  margin: 50px auto;
-  padding: 30px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin: 70px auto;
+  padding: 36px 32px;
+  background: linear-gradient(180deg, #ffffff, #f7f9fc);
+  border-radius: 16px;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+  animation: fadeUp 0.5s ease;
 }
 
+/* subtle entrance animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===============================
+   TITLE
+================================ */
 .signup-container h2 {
   text-align: center;
-  margin-bottom: 25px;
-  color: #2a7be4;
-  font-size: 28px;
+  margin-bottom: 26px;
+  color: #2563eb; /* calmer medical blue */
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
+/* ===============================
+   FORM FIELD
+================================ */
 .signup-field {
   display: flex;
   flex-direction: column;
@@ -23,55 +49,98 @@
 
 .signup-field label {
   margin-bottom: 6px;
-  color: #444;
+  color: #374151;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
+/* ===============================
+   INPUTS
+================================ */
 .signup-field input {
-  padding: 12px;
+  padding: 13px 14px;
   font-size: 15px;
-  border-radius: 8px;
-  border: 1px solid #d2d7dd;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
   outline: none;
-  transition: 0.2s;
+  background: #ffffff;
+  transition: all 0.25s ease;
+}
+
+.signup-field input::placeholder {
+  color: #9ca3af;
 }
 
 .signup-field input:focus {
-  border-color: #2a7be4;
-  box-shadow: 0 0 4px rgba(42, 123, 228, 0.4);
+  border-color: #2563eb;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.15),
+    0 4px 10px rgba(37, 99, 235, 0.1);
 }
 
+/* ===============================
+   BUTTON
+================================ */
 .signup-btn {
   width: 100%;
-  padding: 12px;
-  background: #2a7be4;
+  padding: 14px;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
-  margin-top: 10px;
+  font-weight: 600;
+  margin-top: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.35);
 }
 
 .signup-btn:hover {
-  background: #1f64b8;
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 26px rgba(37, 99, 235, 0.45);
 }
 
+.signup-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    0 6px 14px rgba(37, 99, 235, 0.3);
+}
+
+/* ===============================
+   LOGIN LINK
+================================ */
 .signup-login-text {
   text-align: center;
-  margin-top: 15px;
-  color: #555;
+  margin-top: 18px;
+  color: #4b5563;
   font-size: 14px;
 }
 
 .signup-login-text a {
-  color: #2a7be4;
+  color: #2563eb;
   font-weight: 600;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .signup-login-text a:hover {
+  color: #1e40af;
   text-decoration: underline;
+}
+
+/* ===============================
+   MOBILE OPTIMIZATION
+================================ */
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 28px 22px;
+    margin: 40px auto;
+  }
+
+  .signup-container h2 {
+    font-size: 26px;
+  }
 }
