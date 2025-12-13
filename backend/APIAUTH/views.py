@@ -36,19 +36,16 @@ def google_login_callback(request):
     social_account = social_accounts.first()
 
     if not social_account:
-        print("no account for user : " ,user)
+        print("no account for user : ", user)
+        return redirect('http://localhost:5173/login/callback/?error=NoSocialAccount')
 
-        return redirect('http://localhost/login/callback/?error=NoSocialAccount')
-
-    token = SocialToken.objects.filter( account=social_account, account__provider="google" ).first()
-
+    token = SocialToken.objects.filter(account=social_account, account__provider='google').first()
 
     if token:
         print('google token found:', token.token)
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         return redirect(f'http://localhost:5173/login/callback/?access_token={access_token}')
-
     else:
         print("no google token found for user : ", user)
         return redirect(f'http://localhost:5173/login/callback/?error=NoGoogleToken')
@@ -69,4 +66,4 @@ def validate_google_token(request):
 
         except json.JSONDecodeError:
             return JsonResponse({'detail': 'Invalid JSON'}, status=400)
-        return JsonResponse({'detail': 'method not allowed.'}, status=405)
+    return JsonResponse({'detail': 'method not allowed.'}, status=405)

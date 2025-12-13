@@ -1,52 +1,38 @@
 import { useState } from "react";
 import api from "../../Auth/api";
 import { useAuth } from "../../Auth/AuthContext";
-import { NavLink } from "react-router";
-import "../../Style/login.css";
 import GoogleLoginBtn from "../../Auth/GoogleLoginBtn";
 
-function Login() {
-    const { login } = useAuth();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+export default function Login() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const submit = async () => {
-        const res = await api.post("/api/token/", { username, password });
-        login(res.data.access);
-        window.location.href = "/dashboard";
-    };
+  const submit = async () => {
+    const res = await api.post("/token/", {
+      username: email,
+      password,
+    });
 
-    return (
-        <div className="login-container">
+    login(res.data.access);
+    window.location.href = "/Dashboard";
+  };
 
-            <h2>Login</h2>
+  return (
+    <div>
+      <h2>Login</h2>
 
-            <div className="login-field">
-                <label>Email</label>
-                <input
-                    placeholder="Enter your username"
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-            </div>
+      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-            <div className="login-field">
-                <label>Password</label>
-                <input
-                    type="password"
-                    placeholder="Enter password"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-            </div>
+      <button onClick={submit}>Login</button>
 
-            <button className="login-btn" onClick={submit}> Login </button>
-            <GoogleLoginBtn />
-            <div className="login-footer">
-                <p>New User?</p>
-                <NavLink to="/Signup">Signup</NavLink>
-            </div>
-
-        </div>
-    );
+      <hr />
+      <GoogleLoginBtn />
+    </div>
+  );
 }
-
-export default Login;

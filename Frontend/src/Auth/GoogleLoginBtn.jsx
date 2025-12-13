@@ -1,9 +1,21 @@
-export default function GoogleLoginBtn() {
-    const handleLogin = () => {
-        window.location.href = "http://localhost:8000/accounts/google/login/";
-    };
+import { GoogleLogin } from "@react-oauth/google";
+import api from "./api";
+import { useAuth } from "./AuthContext";
 
-    return (
-        <button onClick={handleLogin}>Login with Google</button>
-    );
+export default function GoogleLoginBtn() {
+  const { login } = useAuth();
+
+  
+  const success = async (res) => {
+    const googleToken = res.credential;
+
+    const r = await api.post("/google/", {
+      token: googleToken,
+    });
+
+    login(r.data.access);
+    window.location.href = "/dashboard";
+  };
+
+  return <GoogleLogin onSuccess={success} onError={() => alert("Google Failed")} />;
 }

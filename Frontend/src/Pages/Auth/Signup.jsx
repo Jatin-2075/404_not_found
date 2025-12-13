@@ -1,58 +1,38 @@
 import { useState } from "react";
 import api from "../../Auth/api";
-import { NavLink } from "react-router";
-import "../../Style/signup.css";
+import { useAuth} from "../../Auth/AuthContext";
+import GoogleLoginBtn from "../../Auth/GoogleLoginBtn";
 
-function Signup() {
-    const [email, setEmail] = useState("");
-    const [username, setUser] = useState("");
-    const [password, setPass] = useState("");
+export default function Signup() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const submit = async () => {
-        await api.post("/api/user/register", { email, username, password });
-        alert("Registered!");
-    };
+  const submit = async () => {
+    const res = await api.post("/register/", {
+      email,
+      password,
+    });
 
-    return (
-        <div className="signup-container">
+    login(res.data.access);
+    window.location.href = "/dashboard";
+  };
 
-            <h2>Create Account</h2>
+  return (
+    <div>
+      <h2>Signup</h2>
 
-            <div className="signup-field">
-                <label>Email</label>
-                <input
-                    placeholder="Enter your email"
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-            </div>
+      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-            <div className="signup-field">
-                <label>Username*</label>
-                <input
-                    placeholder="Enter your username"
-                    onChange={(e) => setUser(e.target.value)}
-                />
-            </div>
+      <button onClick={submit}>Signup</button>
 
-            <div className="signup-field">
-                <label>Password*</label>
-                <input
-                    placeholder="Enter password"
-                    type="password"
-                    onChange={(e) => setPass(e.target.value)}
-                />
-            </div>
-
-            <button className="signup-btn" onClick={submit}>
-                Register
-            </button>
-
-            <div className="signup-login-text">
-                <p>Already have an account?</p>
-                <NavLink to="/Login">Login</NavLink>
-            </div>
-        </div>
-    );
+      <hr />
+      <GoogleLoginBtn />
+    </div>
+  );
 }
-
-export default Signup;

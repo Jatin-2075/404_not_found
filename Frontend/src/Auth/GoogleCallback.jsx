@@ -10,7 +10,7 @@ export default function GoogleCallback() {
 
         if (access) {
             login(access);
-            window.location.href = "/dashboard";
+            window.location.href = "/Dashboard";
         }
     }, []);
 
