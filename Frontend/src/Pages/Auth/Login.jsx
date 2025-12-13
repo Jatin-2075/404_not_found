@@ -2,7 +2,8 @@ import { useState } from "react";
 import api from "../../Auth/api";
 import { useAuth } from "../../Auth/AuthContext";
 import { NavLink } from "react-router";
-import "../Style/login.css";
+import "../../Style/login.css";
+import GoogleLoginBtn from "../../Auth/GoogleLoginBtn";
 
 function Login() {
     const { login } = useAuth();
@@ -37,10 +38,8 @@ function Login() {
                 />
             </div>
 
-            <button className="login-btn" onClick={submit}>
-                Login
-            </button>
-
+            <button className="login-btn" onClick={submit}> Login </button>
+            <GoogleLoginBtn />
             <div className="login-footer">
                 <p>New User?</p>
                 <NavLink to="/Signup">Signup</NavLink>
