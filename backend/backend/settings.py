@@ -90,7 +90,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 STATIC_URL = "/static/"
 
-
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 SITE_ID = 1
