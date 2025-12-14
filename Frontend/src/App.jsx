@@ -14,7 +14,7 @@ import Help from "./Pages/Help";
 
 const router = createBrowserRouter([
   {
-    element: <Layout />,          // ✅ Navbar wrapper
+    element: <Layout />,
     children: [
       { path: "/Home", element: <Home /> },
       { path: "/Dashboard", element: <Dashboard /> },
@@ -25,7 +25,6 @@ const router = createBrowserRouter([
     ],
   },
 
-  // Routes WITHOUT navbar
   { path: "/", element: <Intro /> },
   { path: "/Login", element: <Login /> },
   { path: "/Signup", element: <Signup /> },

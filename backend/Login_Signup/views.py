@@ -65,3 +65,47 @@ def Logout(request):
         return JsonResponse ({'msg' : 'Success', 'success' : True})
 
     return JsonResponse({'success' : False , 'msg' : 'Some Error Occurred'})
+
+@login_required
+@csrf_exempt
+def Profile_creation(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'msg' : 'unauthorized request if logged in try contacting developers ', 'suscess' : False}, status=401)
+
+    if request.method == 'POST':
+
+        profile , create= Profile.objects.get_or_create(user=request.user)
+
+        profile.name = request.POST.get("name")
+        profile.age = request.POST.get("age")
+        profile.gender = request.POST.get("gender")
+        profile.weight = request.POST.get("weight")
+        profile.height = request.POST.get("height")
+        profile.bloodgroup = request.POST.get("bloodgroup")
+        profile.allergies = request.POST.get("allergies")
+
+        profile.save()
+
+        return JsonResponse({'msg' : 'profile created', 'success': True})
+
+    return ({'msg' : 'something went wrong', 'success' : False})
+
+
+@login_required
+@csrf_exempt
+def Send_Profile(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'msg' : 'Unauthorized Login', 'success' : False})
+
+    return JsonResponse({
+        "username":request.user.username,
+        "name":request.user.name,
+        "email":request.user.email,
+        "age":request.user.age,
+        "gender":request.user.gender,
+        "weight":request.user.weight,
+        "height":request.user.height,
+        "bloodgroup":request.user.bloodgroup,
+        "allergies":request.user.allergies,
+    })
+         
