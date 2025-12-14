@@ -8,3 +8,19 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class Create_profile(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=50)
+    age = models.PositiveIntegerField()
+    gender = models.CharField(max_length=50)
+    weight = models.FloatField()
+    height = models.FloatField()
+    bloodgroup = models.CharField(max_length=100)
+    allergies = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.user.username

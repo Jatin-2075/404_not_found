@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CreateProfile = () => {
     const [profile, setProfile] = useState({
-        image: null,
+        photo: null,
         name: "",
         age: "",
         gender: "",
@@ -11,25 +12,54 @@ const CreateProfile = () => {
         bloodGroup: "",
         allergies: "",
     });
+    
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setProfile({
-            ...profile,
-            [e.target.name]: e.target.value,
-        });
+        const {name, value, files} = e.target;
+
+        setProfile((prev) => ({
+            ...prev,
+            [name] : files ? files[0] : value,
+        }))
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(profile);
-        alert("Profile saved");
-    };
 
-    try{
-        
-    } catch{
+        const formdata = new FormData();
+        Object.keys(profile).forEach(key => {
+            formdata.append(key, profile[key]);
+        })
+        try {
+            const res = await fetch("http://localhost:8000/Create_profile/", {
+                method: 'POST',
+                body: formdata,
+                credentials: 'include'
+
+            });
+
+            if(!res.ok){
+                alert("Server Error Sorry")
+            }
+            const data = await res.json()
+            console.log(data);
+
+            if(data.success){
+                alert(data.msg)
+                navigate("/Dashboard")
+            }
+            else{
+                alert(data.msg)
+            }
+        } catch (err) {
+            console.log(err)
+        };
 
     }
+
+
 
     return (
         <div className="profile-container">
@@ -41,10 +71,8 @@ const CreateProfile = () => {
                     <label>Upload photo</label>
                     <input
                         name="photo"
-                        placeholder="upload photo"
                         type="file"
                         required
-                        value={profile.photo}
                         onChange={handleChange}
                         accept="image/"
                     />
