@@ -1,4 +1,4 @@
-from .models import Profile
+from .models import Profile, Status
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
@@ -229,4 +229,16 @@ def Send_Profile(request):
         "success": True
     })
 
-         
+
+@login_required
+def set_status(request):
+    status_obj, created = Status.objects.get_or_create(user=request.user)
+
+    status_value = request.POST.get("status")
+    status_obj.status = status_value == "true"
+    status_obj.save()
+
+    return JsonResponse({
+        'success': True,
+        'msg': 'Status updated'
+    })
