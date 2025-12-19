@@ -49,13 +49,13 @@ export default function Upload() {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      alert("Only PDF and DOCX files allowed!");
+      toast.error("Only PDF and DOCX files allowed!");
       return;
     }
 
     const MAX_SIZE = 10 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      alert("Max size is 10MB.");
+      toast.error("Max size is 10MB.");
       return;
     }
 
@@ -129,7 +129,7 @@ export default function Upload() {
   // ---- download summary as text (frontend copy) ----
   const handleDownload = () => {
     if (!pdfUrl) {
-      alert("Summary PDF not available yet.");
+      toast.error("Summary PDF not available yet.");
       return;
     }
 

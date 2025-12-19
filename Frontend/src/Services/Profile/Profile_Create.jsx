@@ -41,17 +41,17 @@ const CreateProfile = () => {
             });
 
             if (!res.ok) {
-                alert("Server Error Sorry")
+                toast.error("Server Error Sorry")
             }
             const data = await res.json()
             console.log(data);
 
             if (data.success) {
-                alert(data.msg)
+                toast.error(data.msg)
                 navigate("/Dashboard")
             }
             else {
-                alert(data.msg)
+                toast.error(data.msg)
             }
         } catch (err) {
             console.log(err)
