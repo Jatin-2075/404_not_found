@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../Style/SmartHelp.css";
+import { toast } from "react-toastify";
 
 const Smart_help = () => {
   const [conversations, setConversations] = useState([
