@@ -1,0 +1,153 @@
+.home-wrapper {
+    display: flex;
+    min-height: calc(100vh - 70px); /* Subtracts height of your navbar */
+    background: #f8fbff;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Sidebar Styling --- */
+.app-sidebar {
+    width: 240px;
+    background: #ffffff;
+    border-right: 1px solid #eef2f6;
+    padding: 30px 15px;
+}
+
+.side-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    text-decoration: none;
+    color: #64748b;
+    font-weight: 600;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+}
+
+.side-link:hover, .side-link.active {
+    background: #0062ff;
+    color: #ffffff;
+}
+
+/* --- Main Content --- */
+.dashboard-content {
+    flex: 1;
+    padding: 40px;
+    max-width: 1200px;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+.greeting h1 {
+    font-size: 2rem;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+}
+
+/* --- Dashboard Grid --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.glass-card {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 30px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 10px 25px rgba(0, 98, 255, 0.04);
+}
+
+/* --- Score Ring Animation --- */
+.score-ring {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 20px auto;
+}
+
+.score-ring svg {
+    width: 150px;
+    height: 150px;
+    transform: rotate(-90deg);
+}
+
+.score-ring circle {
+    fill: none;
+    stroke-width: 12;
+    stroke: #f1f5f9;
+    stroke-dasharray: 440;
+}
+
+.score-ring circle:last-child {
+    stroke: #0062ff;
+    stroke-linecap: round;
+    transition: 1.5s ease-in-out;
+}
+
+.score-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* --- Shortcuts --- */
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.mini-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #f1f5f9;
+}
+
+.mini-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.blue { background: #eef2ff; }
+.green { background: #f0fdf4; }
+
+/* --- AI Banner --- */
+.ai-banner {
+    background: linear-gradient(135deg, #0062ff 0%, #00d4ff 100%);
+    border-radius: 28px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.btn-ai-launch {
+    background: white;
+    color: #0062ff;
+    padding: 16px 32px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-weight: 700;
+}
