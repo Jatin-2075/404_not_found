@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import "../../Style/profile_create.css"
 const CreateProfile = () => {
     const [profile, setProfile] = useState({
         photo: null,
