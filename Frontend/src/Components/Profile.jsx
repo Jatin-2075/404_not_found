@@ -31,7 +31,7 @@ const Profile_Status = () => {
         if (completed) {
             navigate("/Profile");
         } else {
-            navigate("/CreateProfile");
+            navigate("/Profile_create");
         }
     };
 
