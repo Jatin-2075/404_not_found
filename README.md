@@ -11,7 +11,7 @@ Frontend/
 │   │   ├── Footer.jsx
 │   │   ├── UploadCard.jsx
 │   │   ├── Loader.jsx
-│   │   └── Alert.jsx
+│   │   └── toast.error.jsx
 │   │
 │   ├── pages/
 │   │   ├── Home.jsx          # Landing page

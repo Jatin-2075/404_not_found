@@ -13,13 +13,13 @@ const Logout = () => {
             const data = await res.json();
 
             if (data.success) {
-                alert("Logged out");
+                toast.error("Logged out");
                 window.location.href = "/Login";
             } else {
-                alert(data.msg || "Logout error");
+                toast.error(data.msg || "Logout error");
             }
         } catch (err) {
-            alert("Server not reachable");
+            toast.error("Server not reachable");
         }
     };
 
