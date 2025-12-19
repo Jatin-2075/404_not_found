@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "Login_Signup",
     "ML_Model",
+    'django_extensions',
+
 
     "corsheaders",
     "rest_framework",

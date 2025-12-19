@@ -1,4 +1,4 @@
-from .models import Profile, Status
+from .models import Profile, Status, ChatSession, ChatMessage
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
@@ -246,3 +246,41 @@ def Status_view(request):
             return JsonResponse({'msg' : 'Invalid Data', 'success' : False}, status=400)
 
     return JsonResponse({"success": True, "status": status_obj.status})
+
+from django.views.decorators.http import require_GET
+
+@require_GET
+@login_required
+def get_chats(request):
+    sessions = ChatSession.objects.filter(user=request.user).order_by("-created_at")[:20]
+
+    data = []
+    for session in sessions:
+        data.append({
+            "id": session.id,
+            "title": session.title,
+        })
+
+    return JsonResponse({"chats": data})
+
+
+@require_GET
+@login_required
+def get_messages(request, chat_id):
+    messages = ChatMessage.objects.filter(
+        session__id=chat_id,
+        session__user=request.user
+    ).order_by("created_at")
+
+    data = [
+        {"role": msg.role, "text": msg.text}
+        for msg in messages
+    ]
+
+    return JsonResponse({"messages": data})
+
+
+from django.http import JsonResponse
+
+def health(request):
+    return JsonResponse({"status": "backend running"})

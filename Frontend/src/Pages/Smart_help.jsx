@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import "../Style/SmartHelp.css";
 
 const Smart_help = () => {
@@ -18,6 +19,8 @@ const Smart_help = () => {
   // ===============================
   // CREATE NEW CHAT
   // ===============================
+  const MAX_CHATS = 20;
+
   const createNewChat = () => {
     const newChat = {
       id: Date.now(),
@@ -25,7 +28,11 @@ const Smart_help = () => {
       messages: [],
     };
 
-    setConversations((prev) => [newChat, ...prev]);
+    setConversations((prev) => {
+      const updated = [newChat, ...prev];
+      return updated.slice(0, MAX_CHATS); // 🔑 LIMIT
+    });
+
     setActiveId(newChat.id);
     setQuery("");
   };
@@ -46,22 +53,38 @@ const Smart_help = () => {
   // ===============================
   // SEND MESSAGE
   // ===============================
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!query.trim()) return;
 
+    const messageText = query;
+
+    setQuery("");
+
+    // Optimistic UI update
     setConversations((prev) =>
       prev.map((conv) =>
         conv.id === activeId
           ? {
               ...conv,
-              messages: [...conv.messages, { role: "user", text: query }],
+              messages: [...conv.messages, { role: "user", text: messageText }],
             }
           : conv
       )
     );
 
-    setQuery("");
+    // Save to backend
+    const form = new FormData();
+    form.append("session_id", activeId);
+    form.append("text", messageText);
+    form.append("role", "user");
+
+    await fetch("http://127.0.0.1:8000/chat/message/", {
+      method: "POST",
+      body: form,
+      credentials: "include",
+    });
   };
+
 
   // ===============================
   // ENTER vs SHIFT+ENTER
@@ -75,10 +98,50 @@ const Smart_help = () => {
 
   // ===============================
   // AUTO SCROLL
+  
   // ===============================
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/chat/list/", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.chats && data.chats.length > 0) {
+          setConversations(
+            data.chats.map((c) => ({
+              ...c,
+              messages: [],
+            }))
+          );
+          setActiveId(data.chats[0].id);
+        }
+      });
+  }, []);
+
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeConversation.messages]);
+
+  useEffect(() => {
+    if (!activeId) return;
+
+    fetch(`http://127.0.0.1:8000/chat/${activeId}/messages/`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === activeId
+              ? { ...conv, messages: data.messages }
+              : conv
+          )
+        );
+      });
+  }, [activeId]);
+
 
   return (
     <div className="ai-layout">
