@@ -21,6 +21,9 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = f"SmartZen <{EMAIL_HOST_USER}>"
 
+
+TIME_ZONE = "Asia/Kolkata"
+USE_TZ = True
 # ===============================
 # APPS & MIDDLEWARE
 # ===============================
