@@ -1,0 +1,194 @@
+/* ===== Container ===== */
+.profile-view-container {
+  min-height: 100vh;
+  background: #f8fbff;
+  display: flex;
+  justify-content: center;
+  padding: 30px 12px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+/* ===== Wrapper ===== */
+.profile-view-container > div,
+.profile-edit-form {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-radius: 16px;
+  padding: 28px;
+}
+
+/* ===== Header ===== */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* ===== Buttons ===== */
+.edit-btn,
+.back-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-btn:hover,
+.back-btn:hover {
+  background: #eff6ff;
+}
+
+/* ===== Sections ===== */
+.profile-section,
+.form-section {
+  margin-bottom: 28px;
+}
+
+.profile-section h3,
+.form-section h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #1e293b;
+}
+
+/* ===== Grid ===== */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.profile-field {
+  background: #f8fafc;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.profile-field.full-width {
+  grid-column: span 3;
+}
+
+.profile-field label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.profile-field p {
+  margin-top: 4px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* ===== Form ===== */
+.profile-edit-form {
+  margin-top: 10px;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-field.full-width {
+  grid-column: span 2;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  outline: none;
+  font-size: 14px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #2563eb;
+}
+
+/* ===== Actions ===== */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.save-btn {
+  flex: 1;
+  padding: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background: #1d4ed8;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 12px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* ===== Loading / Error ===== */
+.loading,
+.error {
+  font-weight: 600;
+  color: #475569;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .profile-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-field.full-width {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-field.full-width {
+    grid-column: span 1;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

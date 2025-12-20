@@ -1,340 +1,215 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { get, post } from "../../utils/api";
 import { toast } from "react-toastify";
-import "../../Style/profile_view.css";
+import "../Style/profile_view.css";
+
+const BASE_URL = "http://127.0.0.1:8000";
 
 const ProfileView = () => {
-    const [profile, setProfile] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({
-        name: "",
-        age: "",
-        gender: "",
-        weight: "",
-        height: "",
-        bloodgroup: "",
-        allergies: "",
-    });
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    gender: "",
+    weight: "",
+    height: "",
+    bloodgroup: "",
+    allergies: "",
+  });
 
-    useEffect(() => {
-        fetchProfile();
-    }, []);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("access_token");
 
-    const fetchProfile = async () => {
-        try {
-            const data = await get("/profile/");
+  useEffect(() => {
+    if (!token) {
+      toast.error("Session expired. Login again.");
+      navigate("/Login");
+      return;
+    }
+    fetchProfile();
+  }, []);
 
-            if (data.success) {
-                setProfile(data);
-                setFormData({
-                    name: data.name || "",
-                    age: data.age || "",
-                    gender: data.gender || "",
-                    weight: data.weight || "",
-                    height: data.height || "",
-                    bloodgroup: data.bloodgroup || "",
-                    allergies: data.allergies || "",
-                });
-            } else {
-                toast.error("Failed to load profile");
-                navigate("/Profile_create");
-            }
-        } catch (error) {
-            console.error("Profile fetch error:", error);
-            toast.error(error.message || "Failed to load profile");
-        } finally {
-            setLoading(false);
-        }
-    };
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/profile/get`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+      const data = await res.json();
 
-    const handleSave = async (e) => {
-        e.preventDefault();
+      if (!data.success) {
+        navigate("/Profile_create");
+        return;
+      }
 
-        // Validation
-        if (!formData.name.trim()) {
-            toast.error("Name is required");
-            return;
-        }
+      setProfile(data);
+      setFormData({
+        name: data.name || "",
+        age: data.age || "",
+        gender: data.gender || "",
+        weight: data.weight || "",
+        height: data.height || "",
+        bloodgroup: data.bloodgroup || "",
+        allergies: data.allergies || "",
+      });
+    } catch {
+      toast.error("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        if (!formData.age || formData.age < 0 || formData.age > 150) {
-            toast.error("Please enter a valid age");
-            return;
-        }
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-        setSaving(true);
+  const handleSave = async (e) => {
+    e.preventDefault();
 
-        try {
-            const data = await post("/profile/create/", {
-                name: formData.name.trim(),
-                age: parseInt(formData.age),
-                gender: formData.gender,
-                weight: formData.weight ? parseFloat(formData.weight) : null,
-                height: formData.height ? parseFloat(formData.height) : null,
-                bloodgroup: formData.bloodgroup.trim() || null,
-                allergies: formData.allergies.trim() || null,
-            });
+    if (!formData.name.trim()) return toast.error("Name required");
+    if (!formData.age || formData.age < 0 || formData.age > 150)
+      return toast.error("Invalid age");
 
-            if (data.success) {
-                toast.success("Profile updated successfully!");
-                setIsEditing(false);
-                fetchProfile();
-            } else {
-                toast.error(data.msg || "Failed to update profile");
-            }
-        } catch (error) {
-            console.error("Profile update error:", error);
-            toast.error(error.message || "Server error occurred");
-        } finally {
-            setSaving(false);
-        }
-    };
+    setSaving(true);
 
-    const handleCancel = () => {
+    try {
+      const res = await fetch(`${BASE_URL}/profile/create/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          age: parseInt(formData.age),
+          weight: formData.weight || null,
+          height: formData.height || null,
+          bloodgroup: formData.bloodgroup || null,
+          allergies: formData.allergies || null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Profile updated");
         setIsEditing(false);
-        // Reset form data to original profile data
-        setFormData({
-            name: profile.name || "",
-            age: profile.age || "",
-            gender: profile.gender || "",
-            weight: profile.weight || "",
-            height: profile.height || "",
-            bloodgroup: profile.bloodgroup || "",
-            allergies: profile.allergies || "",
-        });
-    };
-
-    if (loading) {
-        return (
-            <div className="profile-view-container">
-                <div className="loading">Loading profile...</div>
-            </div>
-        );
+        fetchProfile();
+      } else {
+        toast.error(data.msg || "Update failed");
+      }
+    } catch {
+      toast.error("Server error");
+    } finally {
+      setSaving(false);
     }
+  };
 
-    if (!profile) {
-        return (
-            <div className="profile-view-container">
-                <div className="error">Profile not found</div>
-            </div>
-        );
-    }
+  const handleCancel = () => {
+    setIsEditing(false);
+    setFormData({
+      name: profile.name || "",
+      age: profile.age || "",
+      gender: profile.gender || "",
+      weight: profile.weight || "",
+      height: profile.height || "",
+      bloodgroup: profile.bloodgroup || "",
+      allergies: profile.allergies || "",
+    });
+  };
 
-    return (
-        <div className="profile-view-container">
-            <div className="profile-header">
-                <h2>Your Health Profile</h2>
-                {!isEditing && (
-                    <button
-                        className="edit-btn"
-                        onClick={() => setIsEditing(true)}
-                    >
-                        ✏️ Edit Profile
-                    </button>
-                )}
-            </div>
+  if (loading) return <div className="loading">Loading profile…</div>;
 
-            {!isEditing ? (
-                // View Mode
-                <div className="profile-view">
-                    <div className="profile-section">
-                        <h3>Personal Information</h3>
-                        <div className="profile-grid">
-                            <div className="profile-field">
-                                <label>Username</label>
-                                <p>{profile.username}</p>
-                            </div>
-                            <div className="profile-field">
-                                <label>Email</label>
-                                <p>{profile.email}</p>
-                            </div>
-                            <div className="profile-field">
-                                <label>Name</label>
-                                <p>{profile.name || "Not provided"}</p>
-                            </div>
-                            <div className="profile-field">
-                                <label>Age</label>
-                                <p>{profile.age || "Not provided"}</p>
-                            </div>
-                            <div className="profile-field">
-                                <label>Gender</label>
-                                <p>{profile.gender || "Not provided"}</p>
-                            </div>
-                        </div>
-                    </div>
+  return (
+    <div className="profile-view-container">
+      <div className="profile-header">
+        <h2>Your Health Profile</h2>
+        {!isEditing && (
+          <button className="edit-btn" onClick={() => setIsEditing(true)}>
+            ✏️ Edit
+          </button>
+        )}
+      </div>
 
-                    <div className="profile-section">
-                        <h3>Health Information</h3>
-                        <div className="profile-grid">
-                            <div className="profile-field">
-                                <label>Weight</label>
-                                <p>{profile.weight ? `${profile.weight} kg` : "Not provided"}</p>
-                            </div>
-                            <div className="profile-field">
-                                <label>Height</label>
-                                <p>{profile.height ? `${profile.height} cm` : "Not provided"}</p>
-                            </div>
-                            <div className="profile-field">
-                                <label>Blood Group</label>
-                                <p>{profile.bloodgroup || "Not provided"}</p>
-                            </div>
-                            <div className="profile-field full-width">
-                                <label>Allergies</label>
-                                <p>{profile.allergies || "None reported"}</p>
-                            </div>
-                        </div>
-                    </div>
+      {!isEditing ? (
+        <div className="profile-grid">
+          <Field label="Name" value={profile.name} />
+          <Field label="Age" value={profile.age} />
+          <Field label="Gender" value={profile.gender} />
+          <Field label="Weight" value={profile.weight && `${profile.weight} kg`} />
+          <Field label="Height" value={profile.height && `${profile.height} cm`} />
+          <Field label="Blood Group" value={profile.bloodgroup} />
+          <Field label="Allergies" value={profile.allergies || "None"} full />
 
-                    <button
-                        className="back-btn"
-                        onClick={() => navigate("/Dashboard")}
-                    >
-                        Back to Dashboard
-                    </button>
-                </div>
-            ) : (
-                // Edit Mode
-                <form onSubmit={handleSave} className="profile-edit-form">
-                    <div className="form-section">
-                        <h3>Personal Information</h3>
-                        
-                        <div className="form-field">
-                            <label>Name *</label>
-                            <input
-                                name="name"
-                                type="text"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                disabled={saving}
-                            />
-                        </div>
-
-                        <div className="form-field">
-                            <label>Age *</label>
-                            <input
-                                name="age"
-                                type="number"
-                                value={formData.age}
-                                onChange={handleChange}
-                                min="0"
-                                max="150"
-                                required
-                                disabled={saving}
-                            />
-                        </div>
-
-                        <div className="form-field">
-                            <label>Gender *</label>
-                            <select
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                required
-                                disabled={saving}
-                            >
-                                <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <h3>Health Information</h3>
-
-                        <div className="form-field">
-                            <label>Weight (kg)</label>
-                            <input
-                                name="weight"
-                                type="number"
-                                value={formData.weight}
-                                onChange={handleChange}
-                                min="0"
-                                step="0.1"
-                                disabled={saving}
-                            />
-                        </div>
-
-                        <div className="form-field">
-                            <label>Height (cm)</label>
-                            <input
-                                name="height"
-                                type="number"
-                                value={formData.height}
-                                onChange={handleChange}
-                                min="0"
-                                step="0.1"
-                                disabled={saving}
-                            />
-                        </div>
-
-                        <div className="form-field">
-                            <label>Blood Group</label>
-                            <select
-                                name="bloodgroup"
-                                value={formData.bloodgroup}
-                                onChange={handleChange}
-                                disabled={saving}
-                            >
-                                <option value="">Select Blood Group</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                            </select>
-                        </div>
-
-                        <div className="form-field full-width">
-                            <label>Allergies</label>
-                            <textarea
-                                name="allergies"
-                                value={formData.allergies}
-                                onChange={handleChange}
-                                rows="3"
-                                disabled={saving}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-actions">
-                        <button
-                            type="submit"
-                            className="save-btn"
-                            disabled={saving}
-                        >
-                            {saving ? "Saving..." : "Save Changes"}
-                        </button>
-                        <button
-                            type="button"
-                            className="cancel-btn"
-                            onClick={handleCancel}
-                            disabled={saving}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            )}
+          <button className="back-btn" onClick={() => navigate("/Home")}>
+            Back to Home
+          </button>
         </div>
-    );
+      ) : (
+        <form onSubmit={handleSave} className="profile-edit-form">
+          <Input label="Name" name="name" value={formData.name} onChange={handleChange} />
+          <Input label="Age" name="age" type="number" value={formData.age} onChange={handleChange} />
+          <Select label="Gender" name="gender" value={formData.gender} onChange={handleChange}>
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </Select>
+          <Input label="Weight (kg)" name="weight" value={formData.weight} onChange={handleChange} />
+          <Input label="Height (cm)" name="height" value={formData.height} onChange={handleChange} />
+          <Select label="Blood Group" name="bloodgroup" value={formData.bloodgroup} onChange={handleChange}>
+            <option value="">Select</option>
+            {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map(b => (
+              <option key={b}>{b}</option>
+            ))}
+          </Select>
+          <Textarea label="Allergies" name="allergies" value={formData.allergies} onChange={handleChange} />
+
+          <div className="form-actions">
+            <button className="save-btn" disabled={saving}>
+              {saving ? "Saving..." : "Save"}
+            </button>
+            <button type="button" className="cancel-btn" onClick={handleCancel}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
 };
+
+const Field = ({ label, value, full }) => (
+  <div className={`profile-field ${full ? "full-width" : ""}`}>
+    <label>{label}</label>
+    <p>{value || "Not provided"}</p>
+  </div>
+);
+
+const Input = ({ label, ...props }) => (
+  <div className="form-field">
+    <label>{label}</label>
+    <input {...props} />
+  </div>
+);
+
+const Select = ({ label, children, ...props }) => (
+  <div className="form-field">
+    <label>{label}</label>
+    <select {...props}>{children}</select>
+  </div>
+);
+
+const Textarea = ({ label, ...props }) => (
+  <div className="form-field full-width">
+    <label>{label}</label>
+    <textarea rows="3" {...props} />
+  </div>
+);
 
 export default ProfileView;

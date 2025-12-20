@@ -13,6 +13,7 @@ import Signup from "./Pages/Auth/Signup";
 import Help from "./Pages/Help";
 import CreateProfile from "./Services/Profile/Profile_Create";
 import ReportSummary from "./Pages/ReportSummary";
+import ProfileView from "./Components/ProfileView";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,8 @@ const router = createBrowserRouter([
   { path: "/", element: <Intro /> },
   { path: "/Login", element: <Login /> },
   { path: "/Signup", element: <Signup /> },
-  { path: "/Profile_create", element: <CreateProfile/> }
+  { path: "/Profile_create", element: <> <CreateProfile/> </> },
+  { path: "/Profile", element: <> <ProfileView/> </>},
 ]);
 
 function App() {

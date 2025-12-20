@@ -47,8 +47,8 @@ const CreateProfile = () => {
                     name: profile.name.trim(),
                     age: Number(profile.age),
                     gender: profile.gender,
-                    weight: profile.weight || null,
-                    height: profile.height || null,
+                    weight: profile.weight ? parseFloat(profile.weight) : null,  // ← FIXED
+                    height: profile.height ? parseFloat(profile.height) : null,  // ← FIXED
                     bloodgroup: profile.bloodgroup || null,
                     allergies: profile.allergies || null,
                 }),
@@ -64,11 +64,8 @@ const CreateProfile = () => {
             }
 
             toast.success("Profile created successfully");
-            
-            // Update local storage to reflect profile is completed
-            localStorage.setItem("profile_completed", "true");
-            
             navigate("/Home", { replace: true });
+
         } catch (err) {
             console.error("Profile creation error:", err);
             toast.error(err.message || "Server error");
@@ -108,10 +105,10 @@ const CreateProfile = () => {
             }
 
             toast.info("Profile skipped");
-            
+
             // Update local storage
             localStorage.setItem("profile_completed", "false");
-            
+
             navigate("/Home", { replace: true });
         } catch (err) {
             console.error("Skip error:", err);

@@ -179,24 +179,47 @@ def reset_password(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def Profile_creation(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
+    try:
+        profile, _ = Profile.objects.get_or_create(user=request.user)
 
-    profile.name = request.data.get("name")
-    profile.age = request.data.get("age")
-    profile.gender = request.data.get("gender")
-    profile.weight = request.data.get("weight")
-    profile.height = request.data.get("height")
-    profile.bloodgroup = request.data.get("bloodgroup")
-    profile.allergies = request.data.get("allergies")
+        profile.name = request.data.get("name")
+        profile.age = request.data.get("age")
+        profile.gender = request.data.get("gender")
+        
+        # Safely convert weight and height to float
+        weight = request.data.get("weight")
+        height = request.data.get("height")
+        
+        profile.weight = float(weight) if weight else None
+        profile.height = float(height) if height else None
+        profile.bloodgroup = request.data.get("bloodgroup")
+        profile.allergies = request.data.get("allergies")
 
-    profile.save()
+        profile.save()
 
-    status_obj, _ = Status.objects.get_or_create(user=request.user)
-    status_obj.profile_completed = True
-    status_obj.save()
+        status_obj, _ = Status.objects.get_or_create(user=request.user)
+        status_obj.profile_completed = True
+        status_obj.save()
 
-    return JsonResponse({"success": True})
-
+        return JsonResponse({
+            "success": True,
+            "msg": "Profile created successfully",
+            "profile_completed": True
+        })
+        
+    except ValueError as e:
+        logger.error(f"Invalid data type: {str(e)}")
+        return JsonResponse({
+            "success": False, 
+            "msg": "Invalid weight or height format"
+        }, status=400)
+        
+    except Exception as e:
+        logger.error(f"Profile creation error: {str(e)}")
+        return JsonResponse({
+            "success": False, 
+            "msg": "Failed to create profile"
+        }, status=500)
 
 # ---------------- SEND PROFILE ----------------
 @api_view(["GET"])

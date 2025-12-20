@@ -79,10 +79,11 @@ const Login = () => {
 
                 
                 toast.success("Login successful!");
+                console.log(data)
 
                 // Navigate based on profile completion status
-                if (data.user.profile_complete) {
-                    navigate("/dashboard", { replace: true });
+                if (data.user.profile_completed) {
+                    navigate("/Home");
                 } else {
                     navigate("/Profile_create", { replace: true });
                 }
