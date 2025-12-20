@@ -15,7 +15,7 @@ import random
 import hashlib
 import json
 
-from .Service import Func_workout
+from .Services import func_workout, diet_by_bmi
 
 
 def get_tokens_for_user(user):
@@ -242,63 +242,40 @@ def Status_view(request):
         "profile_completed": status_obj.profile_completed
     })
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def Smart_Help(request):
-
-    know = request.data.get("know")
-    workout_level = request.data.get("Workoutlevel")
-    workout_type = request.data.get("WorkoutType")
-
-    if know == "workout":
-        res = func_workout(workout_level, workout_type)
-        return JsonResponse({
-            "msg": "Workout",
-            "success": True,
-            "data": res
-        })
-
-    return JsonResponse({ "success": False, "msg": "Invalid option"})
-
-
-
-
-@api_view(["GET","POST"])
-@permission_classes([IsAuthenticated])
-def Smart_Help(request):
+    """Endpoint for AI-driven workout and diet suggestions."""
     know = request.data.get("know")
 
-    if know == "workout":
-        level = request.data.get("Workoutlevel")
-        workout_type = request.data.get("WorkoutType")
+    try:
+        if know == "workout":
+            level = request.data.get("Workoutlevel")
+            workout_type = request.data.get("WorkoutType")
+            
+            if not level or not workout_type:
+                return JsonResponse({"success": False, "msg": "Level and Type are required"}, status=400)
+            
+            result = func_workout(level, workout_type)
 
-        data = func_workout(level, workout_type)
+        elif know == "diet":
+            bmi = request.data.get("bmi")
+            if not bmi:
+                return JsonResponse({"success": False, "msg": "BMI is required"}, status=400)
+            
+            result = diet_by_bmi(float(bmi))
 
-        return JsonResponse({
-            "success": True,
-            "type": "workout",
-            "data": data
-        })
+        else:
+            return JsonResponse({"success": False, "msg": "Invalid service category"}, status=400)
 
-    if know == "diet":
-        bmi = request.data.get("bmi")
+        # Handle service-layer failures (like API Ninjas 400 errors)
+        if not result["success"]:
+            return JsonResponse(result, status=502) # Bad Gateway: Upstream API failed
 
-        if not bmi:
-            return JsonResponse({
-                "success": False,
-                "msg": "BMI required"
-            })
+        return JsonResponse({"success": True, "type": know, "data": result["data"]})
 
-        data = diet_by_bmi(float(bmi))
-
-        return JsonResponse({
-            "success": True,
-            "type": "diet",
-            "data": data
-        })
-
-    return JsonResponse({
-        "success": False,
-        "msg": "Invalid option"
-    })
+    except (ValueError, TypeError):
+        return JsonResponse({"success": False, "msg": "Invalid data types provided"}, status=400)
+    except Exception as e:
+        logger.critical(f"UNHANDLED VIEW ERROR: {str(e)}")
+        return JsonResponse({"success": False, "msg": "Internal Server Error"}, status=500)

@@ -5,51 +5,62 @@ import { API_BASE_URL } from "../config/api";
 
 const Smart_help = () => {
     const [selected, setSelected] = useState("");
-    const [WorkoutLevel, SetWorkoutLevel] = useState("")
-    const [WorkoutType, SetWorkoutType] = useState("")
+    const [WorkoutLevel, SetWorkoutLevel] = useState("beginner")
+    const [WorkoutType, SetWorkoutType] = useState("strength")
+
 
     const [BMI, setBMI] = useState("");
     const [DietData, setDietData] = useState(null);
+    const accessToken = localStorage.getItem("access_token");
+
 
 
     const [WorkoutData, SetWorkoutData] = useState({})
 
     const HandleSubmit = async () => {
+        if (!selected) return alert("Please select an option first.");
 
-        if (!selected) {
-            alert("Select an option first");
-            return;
-        }
+        try {
+            const res = await fetch(`${API_BASE_URL}/Smart_Help/`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    know: selected,
+                    Workoutlevel: WorkoutLevel,
+                    WorkoutType: WorkoutType,
+                    bmi: BMI,
+                })
+            });
 
-        if (selected === "help") {
-            window.location.href = "/Help";
-            return;
-        }
+            // 1. Validate Content-Type to prevent parsing HTML as JSON
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Server crashed and sent an HTML error page.");
+            }
 
-        const res = await fetch(`${API_BASE_URL}/Smart_Help`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                know: selected,
-                Workoutlevel: WorkoutLevel,
-                WorkoutType: WorkoutType,
-                bmi: BMI,
-            })
-        });
+            const data = await res.json();
 
-        const data = await res.json();
-        console.log(data);
+            // 2. Handle Logic Errors (502, 400, etc.)
+            if (!res.ok || !data.success) {
+                alert(data.msg || "An error occurred on the server.");
+                return;
+            }
 
-        if (data.type === "workout") {
-            SetWorkoutData(data);
-            setDietData(null);
-        }
+            // 3. Update States
+            if (data.type === "workout") {
+                SetWorkoutData(data);
+                setDietData(null);
+            } else if (data.type === "diet") {
+                setDietData(data.data);
+                SetWorkoutData({});
+            }
 
-        if (data.type === "diet") {
-            setDietData(data.data);
-            SetWorkoutData({});
+        } catch (err) {
+            console.error("Frontend Critical Error:", err);
+            alert("Failed to communicate with the server. Please check the console.");
         }
     };
 
@@ -86,12 +97,14 @@ const Smart_help = () => {
                             <select value={WorkoutType} onChange={(e) => SetWorkoutType(e.target.value)}>
                                 <option value="strength">strength</option>
                                 <option value="cardio">cardio</option>
-                                <option value="stretching">stretching</option>
                                 <option value="plyometrics">plyometrics</option>
                                 <option value="powerlifting">powerlifting</option>
-                                <option value="olympic_weightlifting">olympic weightlifting</option>
+                                <option value="olympic_weightlifting">olympic_weightlifting</option>
                                 <option value="strongman">strongman</option>
+                                <option value="calisthenics">calisthenics</option>
                             </select>
+
+
 
                         </div>
                     </div>}
