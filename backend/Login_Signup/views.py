@@ -15,8 +15,14 @@ import random
 import hashlib
 import json
 import logging 
-
 from .Services import func_workout, diet_by_bmi
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)
+    return redirect("/login/")
+
 
 logger = logging.getLogger(__name__)
 
