@@ -86,7 +86,6 @@ const ProfileView = () => {
 
         <h2 className="page-title">Health Profile</h2>
 
-        {/* Identity */}
         <div className="profile-identity">
           <div className="avatar-circle">
             {profile.name?.charAt(0).toUpperCase()}
@@ -101,7 +100,6 @@ const ProfileView = () => {
               ✏️ Edit Profile
             </button>
 
-            {/* Vitals */}
             <div className="vitals-grid">
               <Vital label="Age" value={`${profile.age} yrs`} />
               <Vital label="Gender" value={profile.gender} />
@@ -110,7 +108,6 @@ const ProfileView = () => {
               <Vital label="Blood Group" value={profile.bloodgroup || "—"} />
             </div>
 
-            {/* Medical */}
             <div className="medical-section">
               <h4>Allergies</h4>
               <div className="medical-block">

@@ -13,7 +13,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-
   const handleSubmit = async () => {
     const trimmedUsername = username.trim();
     const trimmedEmail = email.trim();
@@ -28,46 +27,73 @@ const Signup = () => {
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(trimmedEmail)) {
-      toast.error("Please enter a valid email address (e.g., example@gmail.com).");
+      toast.error("Please enter a valid email address.");
       return;
     }
 
     if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long for security reasons.");
+      toast.error("Password must be at least 8 characters long.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("The passwords you entered do not match. Please try again.");
+      toast.error("Passwords do not match.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE_URL}/signup/`, {
+      const signupRes = await fetch(`${API_BASE_URL}/signup/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: trimmedUsername,
           email: trimmedEmail,
-          password: password,
+          password,
         }),
       });
 
-      const data = await res.json();
+      const signupData = await signupRes.json();
 
-      if (data.success) {
-        toast.success("Account created! Redirecting...");
-        setTimeout(() => navigate("/Login"), 2000);
-      } else {
-        toast.error(data.msg || "Signup failed. Please try again.");
+      if (!signupRes.ok || !signupData.success) {
+        toast.error(signupData.msg || "Signup failed.");
+        setLoading(false);
+        return;
       }
 
-    } catch {
-      toast.error("A server error occurred. Please try again later.");
+      const loginRes = await fetch(`${API_BASE_URL}/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: trimmedUsername,
+          password,
+        }),
+      });
+
+      const loginData = await loginRes.json();
+
+      if (!loginData.success) {
+        toast.error("Signup successful, but login failed.");
+        setLoading(false);
+        navigate("/Login")
+        return;
+      }
+
+      localStorage.setItem("access_token", loginData.tokens.access);
+      localStorage.setItem("refresh_token", loginData.tokens.refresh);
+      localStorage.setItem("user", JSON.stringify(loginData.user));
+
+      toast.success("Account created successfully!");
+
+      if (loginData.user.profile_completed) {
+        navigate("/Home");
+      } else {
+        navigate("/Profile_create", { replace: true });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error. Try again later.");
     } finally {
       setLoading(false);
     }

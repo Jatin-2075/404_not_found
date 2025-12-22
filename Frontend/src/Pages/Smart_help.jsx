@@ -8,7 +8,7 @@ const Smart_help = () => {
     const [BMI, setBMI] = useState("");
     const [DietData, setDietData] = useState(null);
     const [WorkoutData, SetWorkoutData] = useState({});
-    const [loading, setLoading] = useState(false); // New Loading State
+    const [loading, setLoading] = useState(false);
 
     const accessToken = localStorage.getItem("access_token");
 
@@ -116,7 +116,7 @@ const Smart_help = () => {
                     </button>
                 </div>
 
-                {/* Results Section */}
+           
                 <div className="sh-results-container">
                     {WorkoutData?.data && Array.isArray(WorkoutData.data) && (
                         <div className="sh-result-grid fade-up">
