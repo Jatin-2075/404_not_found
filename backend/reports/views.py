@@ -143,7 +143,7 @@ class ReportHistoryView(APIView):
         reports = (
             MedicalReport.objects
             .filter(user=request.user)
-            .order_by("-uploaded_at")[:12]
+            .order_by("-uploaded_at")[:6]
         )
 
         data = []
