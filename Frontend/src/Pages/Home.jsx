@@ -1,10 +1,39 @@
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import "../Style/home.css";
-import "../Components/customChecks" ; 
+import {
+  checkBMI,
+  checkBloodPressure,
+  checkHeartRate,
+  checkRespiratoryRate,
+} from "../Components/customChecks";
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
 const Home = () => {
   const navigate = useNavigate();
-
   const [latestVitals, setLatestVitals] = useState(null);
   const [bmiTrend, setBmiTrend] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,9 +47,6 @@ const Home = () => {
 
   const token = localStorage.getItem("access_token");
 
-  // =============================
-  // FETCH DASHBOARD DATA
-  // =============================
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/reports/dashboard/", {
       headers: {
@@ -32,12 +58,50 @@ const Home = () => {
         return res.json();
       })
       .then((data) => {
+        console.log("Fetched Data:", data);
         setLatestVitals(data.latest_vitals);
         setBmiTrend(data.bmi_trend || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setLoading(false);
+      });
+  }, [token]);
+
+  const chartData = {
+    labels: bmiTrend.map((_, index) => `Report ${index + 1}`),
+    datasets: [
+      {
+        label: "BMI History",
+        data: bmiTrend,
+        fill: true,
+        borderColor: "#4ade80",
+        backgroundColor: "rgba(74, 222, 128, 0.1)",
+        tension: 0.4,
+        pointBackgroundColor: "#16a34a",
+        pointBorderColor: "#fff",
+        pointHoverRadius: 6,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        grid: { color: "rgba(0, 0, 0, 0.05)" },
+      },
+      x: {
+        grid: { display: false },
+      },
+    },
+  };
 
   if (loading) {
     return (
@@ -52,117 +116,73 @@ const Home = () => {
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-container">
-        {/* HEADER */}
         <header className="dashboard-header">
           <h1 className="header-title">Health Overview</h1>
-          <p className="header-subtitle">
-            Snapshot from your latest medical reports
-          </p>
+          <p className="header-subtitle">Snapshot from your latest medical reports</p>
         </header>
 
-        {/* ACTION BLOCKS */}
         <div className="action-grid">
-          <div
-            className="action-card-upload"
-            onClick={() => navigate("/Upload")}
-          >
+          <div className="action-card-upload" onClick={() => navigate("/Upload")}>
             <div className="action-icon">↑</div>
             <h3 className="action-name">Upload Report</h3>
             <p className="action-text">Get an instant AI-powered summary</p>
           </div>
 
-          <div
-            className="action-card-view"
-            onClick={() => navigate("/Reports")}
-          >
+          <div className="action-card-view" onClick={() => navigate("/Reports")}>
             <div className="action-icon">📂</div>
             <h3 className="action-name">View History</h3>
             <p className="action-text">Access your last 12 medical records</p>
           </div>
         </div>
 
-        {/* VITALS */}
-        {latestVitals && (
-          <div className="vitals-layout">
-            {/* BLOOD PRESSURE */}
-            <div className="vital-glass-card">
-              <h4 className="vital-title">Blood Pressure</h4>
-              <div className="vital-main-value">{latestVitals.bp || "—"}</div>
-              <div className="vital-reference">Normal: {normalRanges.bp}</div>
-              <span
-                className={
-                  latestVitals.bp_status === "High" ||
-                  latestVitals.bp_status === "Low" ||
-                  latestVitals.bp_status === "Abnormal"
-                    ? "badge-alert"
-                    : "badge-safe"
-                }
-              >
-                {latestVitals.bp_status || "Normal"}
-              </span>
-            </div>
-
-            {/* RESPIRATORY RATE */}
-            <div className="vital-glass-card">
-              <h4 className="vital-title">Respiratory Rate</h4>
-              <div className="vital-main-value">
-                {latestVitals.respiratory_rate ?? "—"} <small>/min</small>
-              </div>
-              <div className="vital-reference">
-                Normal: {normalRanges.respiratory_rate}
-              </div>
-              <span className="badge-safe">Normal</span>
-            </div>
-
-            {/* BMI */}
-            <div className="vital-glass-card">
-              <h4 className="vital-title">BMI</h4>
-              <div className="vital-main-value">{latestVitals.bmi ?? "—"}</div>
-              <div className="vital-reference">Normal: {normalRanges.bmi}</div>
-              <span className="badge-safe">Normal</span>
-            </div>
-
-            {/* HEART RATE */}
-            <div className="vital-glass-card">
-              <h4 className="vital-title">Heart Rate</h4>
-              <div className="vital-main-value">
-                {latestVitals.heart_rate ?? "—"} <small>bpm</small>
-              </div>
-              <div className="vital-reference">
-                Normal: {normalRanges.heartRate}
-              </div>
-              <span className="badge-safe">Normal</span>
-            </div>
+        <div className="vitals-layout">
+          <div className="vital-glass-card">
+            <h4 className="vital-title">Blood Pressure</h4>
+            <div className="vital-main-value">{latestVitals?.bp || "—"}</div>
+            <div className="vital-reference">Normal: {normalRanges.bp}</div>
+            <span className={checkBloodPressure(latestVitals?.bp)?.badge || "badge-gray"}>
+              {checkBloodPressure(latestVitals?.bp)?.label || "No Data"}
+            </span>
           </div>
-        )}
 
-        {/* BMI TREND */}
+          <div className="vital-glass-card">
+            <h4 className="vital-title">Respiratory Rate</h4>
+            <div className="vital-main-value">
+              {latestVitals?.respiratory_rate ?? "—"} <small>/min</small>
+            </div>
+            <div className="vital-reference">Normal: {normalRanges.respiratory_rate}</div>
+            <span className={checkRespiratoryRate(latestVitals?.respiratory_rate)?.badge || "badge-gray"}>
+              {checkRespiratoryRate(latestVitals?.respiratory_rate)?.label || "No Data"}
+            </span>
+          </div>
+
+          <div className="vital-glass-card">
+            <h4 className="vital-title">BMI</h4>
+            <div className="vital-main-value">{latestVitals?.bmi ?? "—"}</div>
+            <div className="vital-reference">Normal: {normalRanges.bmi}</div>
+            <span className={checkBMI(latestVitals?.bmi)?.badge || "badge-gray"}>
+              {checkBMI(latestVitals?.bmi)?.label || "No Data"}
+            </span>
+          </div>
+
+          <div className="vital-glass-card">
+            <h4 className="vital-title">Heart Rate</h4>
+            <div className="vital-main-value">
+              {latestVitals?.heart_rate ?? "—"} <small>bpm</small>
+            </div>
+            <div className="vital-reference">Normal: {normalRanges.heartRate}</div>
+            <span className={checkHeartRate(latestVitals?.heart_rate)?.badge || "badge-gray"}>
+              {checkHeartRate(latestVitals?.heart_rate)?.label || "No Data"}
+            </span>
+          </div>
+        </div>
+
         {bmiTrend.length > 0 && (
           <div className="trend-glass-section">
             <h3 className="trend-main-title">BMI Trend</h3>
-            <p className="trend-info">
-              Based on your last {bmiTrend.length} reports
-            </p>
-
-            <div className="chart-container">
-              {bmiTrend.map((value, index) => {
-                const maxBMI = 35;
-                const height = Math.min((value / maxBMI) * 100, 100);
-
-                return (
-                  <div key={index} className="chart-column">
-                    <div className="chart-bar-wrapper">
-                      <div
-                        className="chart-bar-fill"
-                        style={{ height: `${height}%` }}
-                      >
-                        <span className="bar-tooltip">{value}</span>
-                      </div>
-                    </div>
-                    <span className="chart-label">R{index + 1}</span>
-                  </div>
-                );
-              })}
+            <p className="trend-info">Tracking your progress over {bmiTrend.length} reports</p>
+            <div style={{ height: "300px", marginTop: "20px", width: "100%" }}>
+              <Line data={chartData} options={chartOptions} />
             </div>
           </div>
         )}

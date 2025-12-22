@@ -4,12 +4,7 @@ from django.conf import settings
 from django.http import FileResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-
-from .models import MedicalReport
 from .services.text_extractor import extract_text
 from .services.text_normalizer import normalize_text
 from .services.patient_extractor import extract_patient_details
@@ -21,21 +16,12 @@ from .services.pdf_generator import generate_summary_pdf
 from rest_framework.permissions import IsAuthenticated
 from .services.cleanup_report import cleanup_old_reports
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-from .models import MedicalReport
-
-
 from django.utils import timezone
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from .models import MedicalReport
 
 
-from rest_framework.permissions import IsAuthenticated
-# ==========================================================
-# UPLOAD & PROCESS REPORT
-# ==========================================================@method_decorator(csrf_exempt, name="dispatch")  # DEV ONLY
+@method_decorator(csrf_exempt, name="dispatch")
 class UploadReportView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -60,9 +46,6 @@ class UploadReportView(APIView):
             file_size_kb=round(file.size / 1024, 2),
         )
 
-        # -----------------------------
-        # TEXT EXTRACTION
-        # -----------------------------
         raw_text = extract_text(report.file.path)
         text = normalize_text(raw_text)
 
@@ -78,12 +61,6 @@ class UploadReportView(APIView):
         observations = generate_observations(comparison_table)
         final_conclusion = generate_conclusion(comparison_table)
 
-        # -----------------------------
-        # BMI CALCULATION
-        # -----------------------------
-        # -----------------------------
-# BMI EXTRACTION
-# -----------------------------
         bmi = None
         try:
             bmi_value = vitals.get("bmi")
@@ -91,8 +68,7 @@ class UploadReportView(APIView):
                 bmi = round(float(bmi_value), 1)
         except:
             bmi = None
-        
-        # Fallback: calculate from height & weight
+
         if bmi is None:
             try:
                 weight = float(patient_details.get("weight"))
@@ -101,10 +77,7 @@ class UploadReportView(APIView):
                 bmi = round(weight / (height_m ** 2), 1)
             except:
                 bmi = None
-        
-        # -----------------------------
-        # RESPIRATORY RATE EXTRACTION
-        # -----------------------------
+
         respiratory_rate = None
         try:
             rr_value = vitals.get("respiratory_rate")
@@ -114,9 +87,6 @@ class UploadReportView(APIView):
             respiratory_rate = None
 
 
-        # -----------------------------
-        # SAVE EVERYTHING
-        # -----------------------------
         report.extracted_text = text
         report.patient_details = patient_details
         report.vitals = vitals
@@ -126,9 +96,6 @@ class UploadReportView(APIView):
         report.bmi = bmi
         report.respiratory_rate = respiratory_rate
 
-        # -----------------------------
-        # DEBUG PRINTS
-        # -----------------------------
         print("\n========== DEBUG ==========")
         print("Vitals:", vitals)
         print("Respiratory Rate:", respiratory_rate)
@@ -151,9 +118,6 @@ class UploadReportView(APIView):
 
 
 class DownloadReportPDF(APIView):
-    """
-    Generate and download the medical report summary PDF.
-    """
 
     def get(self, request, report_id):
         try:
@@ -179,7 +143,7 @@ class ReportHistoryView(APIView):
         reports = (
             MedicalReport.objects
             .filter(user=request.user)
-            .order_by("-uploaded_at")[:12]
+            .order_by("-uploaded_at")[:6]
         )
 
         data = []
@@ -206,21 +170,16 @@ class ReportHistoryView(APIView):
         return "Normal"
 
 
-from rest_framework.permissions import IsAuthenticated
+
 
 class DashboardView(APIView):
-    """
-    Dashboard API:
-    - Latest vitals (BP, BMI, Respiratory Rate, HR)
-    - BMI trend (last 12 reports)
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         reports = list(
             MedicalReport.objects
             .filter(user=request.user)
-            .order_by("-uploaded_at")[:12]
+            .order_by("-uploaded_at")[:6]
         )
 
         if not reports:
@@ -234,9 +193,6 @@ class DashboardView(APIView):
 
         latest_report = reports[0]
 
-        # -----------------------------
-        # Latest vitals (DB first)
-        # -----------------------------
         latest_vitals = {
             "bp": None,
             "bp_status": None,
@@ -246,11 +202,12 @@ class DashboardView(APIView):
                 latest_report.vitals.get("heart_rate")
                 if latest_report.vitals else None
             ),
+            "raw_vitals": latest_report.vitals,
         }
 
-        # -----------------------------
-        # BP status (from comparison table)
-        # -----------------------------
+        print(latest_vitals)
+
+
         if latest_report.comparison_table:
             for item in latest_report.comparison_table:
                 vital = item.get("vital", "").lower()
@@ -258,11 +215,8 @@ class DashboardView(APIView):
                     latest_vitals["bp"] = item.get("patient_value")
                     latest_vitals["bp_status"] = item.get("status")
 
-        # -----------------------------
-        # BMI trend (for graph)
-        # -----------------------------
         bmi_trend = []
-        for report in reversed(reports):  # oldest → latest
+        for report in reversed(reports):
             if report.bmi is not None:
                 bmi_trend.append(report.bmi)
 

@@ -191,7 +191,7 @@
   border-radius: 8px;
   font-size: 14px;
   border: 1px solid #feb2b2;
-}/* Scope everything strictly under .report-summary-page to prevent affecting reports.css */
+}
 
 .report-summary-page {
   min-height: 100vh;
@@ -272,7 +272,6 @@
   display: inline-block;
 }
 
-/* Scoped button styles specifically for this container */
 .report-summary-page .btn-download-pdf, 
 .report-summary-page .btn-share-report, 
 .report-summary-page .btn-cancel-upload {

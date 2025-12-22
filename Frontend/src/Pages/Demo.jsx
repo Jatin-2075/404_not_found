@@ -13,7 +13,7 @@ const HowItWorks = () => {
                 </p>
 
                 <div className="steps">
-                    {/* STEP 1 */}
+                    
                     <div className="step-card">
                         <span className="step-number">1</span>
                         <h3>Upload Medical Report</h3>
@@ -23,7 +23,7 @@ const HowItWorks = () => {
                         </p>
                     </div>
 
-                    {/* STEP 2 */}
+                   
                     <div className="step-card">
                         <span className="step-number">2</span>
                         <h3>Text Extraction & Analysis</h3>
@@ -33,7 +33,7 @@ const HowItWorks = () => {
                         </p>
                     </div>
 
-                    {/* STEP 3 */}
+                   
                     <div className="step-card">
                         <span className="step-number">3</span>
                         <h3>Vitals Comparison</h3>
@@ -52,7 +52,7 @@ const HowItWorks = () => {
                         </p>
                     </div>
 
-                    {/* STEP 5 */}
+                    
                     <div className="step-card">
                         <span className="step-number">5</span>
                         <h3>Dashboard & Trends</h3>

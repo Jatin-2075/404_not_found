@@ -1,7 +1,7 @@
+from django.db import transaction
 from ..models import MedicalReport
-import os
 
-def cleanup_old_reports(user, keep=12):
+def cleanup_old_reports(user, keep=6):
     reports = (
         MedicalReport.objects
         .filter(user=user)
@@ -10,7 +10,11 @@ def cleanup_old_reports(user, keep=12):
 
     old_reports = reports[keep:]
 
-    for report in old_reports:
-        if report.file and os.path.isfile(report.file.path):
-            os.remove(report.file.path)
-        report.delete()
+    with transaction.atomic():
+        for report in old_reports:
+            if report.file:
+                try:
+                    report.file.delete(save=False)
+                except Exception:
+                    pass
+            report.delete()

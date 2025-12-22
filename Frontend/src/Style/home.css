@@ -119,8 +119,10 @@
   margin-bottom: 15px;
 }
 
-.dashboard-wrapper .badge-safe, 
-.dashboard-wrapper .badge-alert {
+.dashboard-wrapper .badge-safe,
+.dashboard-wrapper .badge-alert,
+.dashboard-wrapper .badge-warning,
+.dashboard-wrapper .badge-neutral {
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -128,8 +130,25 @@
   display: inline-block;
 }
 
-.dashboard-wrapper .badge-safe { background: #dcfce7; color: #15803d; }
-.dashboard-wrapper .badge-alert { background: #fee2e2; color: #b91c1c; }
+.dashboard-wrapper .badge-safe {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.dashboard-wrapper .badge-alert {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.dashboard-wrapper .badge-warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.dashboard-wrapper .badge-neutral {
+  background: #e5e7eb;
+  color: #374151;
+}
 
 .dashboard-wrapper .trend-glass-section {
   background: rgba(255, 255, 255, 0.7);
@@ -156,7 +175,7 @@
 .dashboard-wrapper .chart-container {
   display: flex;
   align-items: flex-end;
-  height: 200px;
+  height: 260px;
   gap: 15px;
 }
 
@@ -165,10 +184,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 40px;
 }
 
 .dashboard-wrapper .chart-bar-wrapper {
-  width: 100%;
+  width: 12px;
+  margin: 0 auto;
   height: 100%;
   background: rgba(0, 0, 0, 0.03);
   border-radius: 12px;
@@ -184,7 +205,9 @@
   position: relative;
   transition: all 0.6s ease;
   cursor: pointer;
+  min-height: 4px;
 }
+
 
 .dashboard-wrapper .chart-bar-fill:hover {
   filter: brightness(1.2);
@@ -211,6 +234,37 @@
   font-size: 0.8rem;
   color: #94a3b8;
 }
+
+.dashboard-wrapper .chart-y-axis {
+  position: absolute;
+  left: 20px;
+  top: 80px;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.dashboard-wrapper .chart-y-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-wrapper .chart-y-label span {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  width: 24px;
+  text-align: right;
+}
+
+.dashboard-wrapper .chart-y-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(148, 163, 184, 0.25);
+}
+
 
 @media (max-width: 768px) {
   .dashboard-wrapper .vitals-layout { grid-template-columns: 1fr 1fr; }
