@@ -1,4 +1,5 @@
-[Link text](https://example.com](https://med-brief-nine.vercel.app/)
+[Link](https://med-brief-nine.vercel.app/)
+
 
 A full-stack health monitoring web application that allows users to upload medical reports, extract meaningful health data, and view structured insights through an interactive dashboard.
 
