@@ -1,4 +1,7 @@
+python==3.10.13
+
 Django==5.1.6
+
 
 # Django REST Framework
 djangorestframework==3.14.0
@@ -18,7 +21,9 @@ reportlab==4.0.7
 
 opencv-python-headless==4.8.1.78
 pytesseract==0.3.10
-Pillow==10.2.0
+Pillow>=10.3.0
+
+dj-database-url==2.1.0
 
 requests==2.31.0
 

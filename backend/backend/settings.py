@@ -7,20 +7,17 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY", default="your_secret_key_here")
+
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-# Render deployment hosts
 ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS", 
-    default="127.0.0.1,localhost"
+    "ALLOWED_HOSTS", default="127.0.0.1,localhost"
 ).split(",")
 
-# Add Render host
 RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default=None)
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Email Configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -40,10 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
     'Login_Signup',
     "reports",
-    
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
@@ -52,9 +47,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # For static files on Render
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "corsheaders.middleware.CorsMiddleware", 
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -67,12 +62,12 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')], 
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
-                "django.template.context_processors.request", 
+                "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -92,25 +87,28 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True, 
+    "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": False,
-    "AUTH_HEADER_TYPES": ("Bearer",), 
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 # CORS Configuration
 CORS_ALLOW_CREDENTIALS = True
 
 # Update with your frontend URL
-FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:5173")
+FRONTEND_URL = config("FRONTEND_URL", default="https://med-brief-nine.vercel.app")
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://med-brief-nine.vercel.app",
 ]
 
 # Add frontend URL if provided
-if FRONTEND_URL and FRONTEND_URL not in CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+if FRONTEND_URL:
+    frontend_clean = FRONTEND_URL.rstrip('/')
+    if frontend_clean not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(frontend_clean)
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -124,6 +122,7 @@ CORS_ALLOW_HEADERS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://med-brief-nine.vercel.app",
 ]
 
 # Add Render URL to CSRF trusted origins
@@ -132,7 +131,9 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 # Add frontend URL to CSRF trusted origins
 if FRONTEND_URL:
-    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
+    frontend_clean = FRONTEND_URL.rstrip('/')
+    if frontend_clean not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(frontend_clean)
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
@@ -157,6 +158,22 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
@@ -193,6 +210,7 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 LOGIN_URL = "/login/"
 
 # API Keys
@@ -219,3 +237,17 @@ LOGGING = {
         },
     },
 }
+
+
+
+#
+'''
+    SECRET_KEY=uqd=7=b*&6a$h55@y!o+r1paup07*g-14p!+h2d)(o)(#(q&-a
+    DEBUG=True
+    ALLOWED_HOSTS=127.0.0.1,localhost
+    FRONTEND_URL=https://med-brief-nine.vercel.app
+    EMAIL_HOST_USER=shivamprakashgami@gmail.com
+    EMAIL_HOST_PASSWORD=ovln rmuu kywv kcml
+    API_NINJAS_KEY=RoE+nmWZTPVUB34sKmFm7A==4WA1mMWA9bLQQsPp
+    DATABASE_URL=postgresql://health_app_project_404_not_found_user:rLUWyGAPEL4zhEZ3MfHNQSOk5ahpwJVW@dpg-d54n33ngi27c73ed9eag-a/health_app_project_404_not_found
+'''
