@@ -9,18 +9,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY", default="your_secret_key_here")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-# Render deployment hosts
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS", 
     default="127.0.0.1,localhost"
 ).split(",")
 
-# Add Render host
+
 RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default=None)
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# Email Configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
