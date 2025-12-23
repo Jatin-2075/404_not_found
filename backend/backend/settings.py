@@ -9,7 +9,7 @@ import dj_database_url
 # ======================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config("SECRET_KEY=_v#c)12#_+wfh2$$uoknksjyh)&fkvx@$57oadlyz7&7^j64*3")
+SECRET_KEY = config("v#c)12#_+wfh2$$uoknksjyh)&fkvx@$57oadlyz7&7^j64*3")
 
 
 DEBUG = config("DEBUG", default=False, cast=bool)
