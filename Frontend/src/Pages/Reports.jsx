@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../Style/reports.css";
+import { API_BASE_URL } from "../config/api";
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -15,7 +16,7 @@ const Reports = () => {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/api/reports/history/", {
+    fetch(` ${ API_BASE_URL } /api/reports/history/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -77,7 +78,7 @@ const Reports = () => {
 
                 <div className="report-action-group">
                   <a
-                    href={`http://127.0.0.1:8000/api/reports/download/${report.id}/`}
+                    href={` ${ API_BASE_URL } /api/reports/download/${report.id}/`}
                     className="btn-download-action"
                   >
                     Download
@@ -86,7 +87,7 @@ const Reports = () => {
                   <button
                     className="btn-share-action"
                     onClick={() => {
-                      const url = `http://127.0.0.1:8000/api/reports/download/${report.id}/`;
+                      const url = ` ${ API_BASE_URL } /api/reports/download/${report.id}/`;
                       if (navigator.share) {
                         navigator.share({
                           title: "Medical Report Summary",
@@ -111,6 +112,9 @@ const Reports = () => {
       </div>
     </div>
   );
+};
+
+export default Reports;
 };
 
 export default Reports;
