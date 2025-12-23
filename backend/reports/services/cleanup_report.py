@@ -8,6 +8,9 @@ def cleanup_old_reports(user, keep=6):
         .order_by("-uploaded_at")
     )
 
+    if reports.count() <= keep:
+        return
+
     old_reports = reports[keep:]
 
     with transaction.atomic():
