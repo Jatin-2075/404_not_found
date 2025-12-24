@@ -87,7 +87,7 @@ const Reports = () => {
                   <button
                     className="btn-share-action"
                     onClick={() => {
-                      const url = ` ${ API_BASE_URL } /api/reports/download/${report.id}/`;
+                      const url = `${ API_BASE_URL }/api/reports/download/${report.id}/`;
                       if (navigator.share) {
                         navigator.share({
                           title: "Medical Report Summary",
