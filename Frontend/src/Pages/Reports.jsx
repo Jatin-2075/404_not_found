@@ -16,7 +16,7 @@ const Reports = () => {
       return;
     }
 
-    fetch(` ${ API_BASE_URL } /api/reports/history/`, {
+    fetch(`${API_BASE_URL}/api/reports/history/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,7 +36,6 @@ const Reports = () => {
       });
   }, []);
 
-
   return (
     <div className="reports-page-wrapper">
       <div className="reports-history-container">
@@ -55,8 +54,7 @@ const Reports = () => {
         )}
 
         <div className="reports-stack-list">
-          {Array.isArray(reports) && reports.map(
-            (report) => (
+          {Array.isArray(reports) && reports.map((report) => (
             <div className="report-item-card" key={report.id}>
               <div className="report-item-content">
                 <h3 className="report-item-filename">{report.filename}</h3>
@@ -68,17 +66,16 @@ const Reports = () => {
 
               <div className="report-item-actions">
                 <span
-                  className={`status-pill-${report.status === "Normal"
-                      ? "normal"
-                      : "attention"
-                    }`}
+                  className={`status-pill-${
+                    report.status === "Normal" ? "normal" : "attention"
+                  }`}
                 >
                   {report.status}
                 </span>
 
                 <div className="report-action-group">
                   <a
-                    href={` ${ API_BASE_URL } /api/reports/download/${report.id}/`}
+                    href={`${API_BASE_URL}/api/reports/download/${report.id}/`}
                     className="btn-download-action"
                   >
                     Download
@@ -87,7 +84,7 @@ const Reports = () => {
                   <button
                     className="btn-share-action"
                     onClick={() => {
-                      const url = ` ${ API_BASE_URL } /api/reports/download/${report.id}/`;
+                      const url = `${API_BASE_URL}/api/reports/download/${report.id}/`;
                       if (navigator.share) {
                         navigator.share({
                           title: "Medical Report Summary",
@@ -105,9 +102,7 @@ const Reports = () => {
                 </div>
               </div>
             </div>
-          )
-          )}
-
+          ))}
         </div>
       </div>
     </div>
