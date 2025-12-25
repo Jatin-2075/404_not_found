@@ -1,5 +1,7 @@
 import React from "react";
 import '../Style/help.css'
+import { MdEmail } from "react-icons/md";
+
 
 const Help = () => {
     return (
@@ -51,11 +53,12 @@ const Help = () => {
             </section>
 
             <section className="help-contact-card">
-                <h2 className="help-contact-heading">📞 Contact Support</h2>
+                <h2 className="help-contact-heading">Contact Support</h2>
                 <p className="help-contact-text">If you need further help, reach out:</p>
                 <div className="help-contact-details">
                     <p>Email: <strong>support@heathbrief.ai</strong></p>
                     <p>WhatsApp: <strong>+91 90000 00000</strong></p>
+                    <a className="mail-link" href="mailto:medbrief9@gmail.com" >< MdEmail size={22}  /> Email</a>
                 </div>
             </section>
         </div>
