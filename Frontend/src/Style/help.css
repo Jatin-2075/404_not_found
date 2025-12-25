@@ -153,3 +153,29 @@
         font-size: 2.2rem !important;
     }
 }
+
+
+.mail-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+
+  padding: 10px 16px;
+  border-radius: 8px;
+
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  transition: all 0.25s ease;
+}
+
+.mail-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 242, 254, 0.35);
+}
+
+.mail-link svg {
+  flex-shrink: 0;
+}
