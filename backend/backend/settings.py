@@ -121,13 +121,19 @@ SIMPLE_JWT = {
 }
 
 # ======================================================
-# CORS + CSRF (VERCEL FRONTEND)
+# CORS + CSRF
 # ======================================================
 FRONTEND_DOMAIN = "https://med-brief-h1s7.vercel.app"
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Allow both production and development origins
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_DOMAIN,
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -170,7 +176,7 @@ STORAGES = {
 # SECURITY (PRODUCTION)
 # ======================================================
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # REMOVED: SECURE_SSL_REDIRECT = True  # This was causing the redirect loop
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -187,7 +193,8 @@ TIME_ZONE = "Asia/Kolkata"
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-LOGIN_URL = "/login/"
+
+# REMOVED: LOGIN_URL = "/login/"  # Not needed for API-only backend
 
 API_NINJAS_KEY = config("API_NINJAS_KEY", default="")
 
@@ -212,16 +219,3 @@ LOGGING = {
         },
     },
 }
-
-'''
-    PYTHON_VERSION==3.10.13
-    SECRET_KEY=uqd=7=b*&6a$h55@y!o+r1paup07*g-14p!+h2d)(o)(#(q&-a
-    DEBUG=True
-    ALLOWED_HOSTS=127.0.0.1,localhost
-    FRONTEND_URL=https://med-brief-nine.vercel.app
-    EMAIL_HOST_USER=shivamprakashgami@gmail.com
-    EMAIL_HOST_PASSWORD=ovln rmuu kywv kcml
-    API_NINJAS_KEY=RoE+nmWZTPVUB34sKmFm7A==4WA1mMWA9bLQQsPp
-    DATABASE_URL=postgresql://health_app_project_404_not_found_user:rLUWyGAPEL4zhEZ3MfHNQSOk5ahpwJVW@dpg-d54n33ngi27c73ed9eag-a/health_app_project_404_not_found
-    
-    '''
