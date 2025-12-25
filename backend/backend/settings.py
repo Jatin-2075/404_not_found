@@ -18,7 +18,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 # ======================================================
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default=None)
+RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default="medbrief-snq0.onrender.com")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
@@ -83,7 +83,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # ======================================================
 # DATABASE
 # ======================================================
-DATABASE_URL = config("DATABASE_URL", default=None)
+DATABASE_URL = config("DATABASE_URL", default= "postgresql://health_app_project_404_not_found_user:rLUWyGAPEL4zhEZ3MfHNQSOk5ahpwJVW@dpg-d54n33ngi27c73ed9eag-a.virginia-postgres.render.com:5432/health_app_project_404_not_found")
 
 if DATABASE_URL:
     DATABASES = {

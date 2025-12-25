@@ -19,6 +19,19 @@ from .Services import func_workout, diet_by_bmi
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 
+from django.http import HttpResponse
+from functools import wraps
+
+def allow_options(view_func):
+    @wraps(view_func)
+    def wrapped(request, *args, **kwargs):
+        if request.method == "OPTIONS":
+            response = HttpResponse(status=200)
+            response["Allow"] = "POST, OPTIONS"
+            return response
+        return view_func(request, *args, **kwargs)
+    return wrapped
+
 def logout_view(request):
     logout(request)
     return redirect("/login/")
@@ -33,8 +46,8 @@ def get_tokens_for_user(user):
         "access": str(refresh.access_token),
     }
 
-
 @csrf_exempt
+@allow_options
 @require_POST
 def Signup(request):
     try:
@@ -76,12 +89,13 @@ def Signup(request):
     except Exception:
         return JsonResponse({"success": False, "msg": "Server error"}, status=500)
 
-
 @csrf_exempt
+@allow_options
 @require_POST
 def Login(request):
     try:
         data = json.loads(request.body)
+
         username = data.get("username", "").strip()
         password = data.get("password", "")
 
@@ -104,8 +118,8 @@ def Login(request):
     except Exception:
         return JsonResponse({"success": False, "msg": "Server error"}, status=500)
 
-
 @csrf_exempt
+@allow_options
 @require_POST
 def forgot_password(request):
     try:
@@ -140,8 +154,8 @@ def forgot_password(request):
     except Exception:
         return JsonResponse({"success": True})
 
-
 @csrf_exempt
+@allow_options
 @require_POST
 def reset_password(request):
     try:
@@ -177,7 +191,7 @@ def reset_password(request):
         return JsonResponse({"success": False, "msg": "Invalid request"}, status=400)
 
 
-@api_view(["POST"])
+@api_view(["POST","GET"])
 @permission_classes([IsAuthenticated])
 def Profile_creation(request):
     try:
