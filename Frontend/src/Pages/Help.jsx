@@ -54,8 +54,8 @@ const Help = () => {
                 <h2 className="help-contact-heading">📞 Contact Support</h2>
                 <p className="help-contact-text">If you need further help, reach out:</p>
                 <div className="help-contact-details">
-                    <p>Email: <strong>support@smartzen.ai</strong></p>
-                    <p>WhatsApp: <strong>+91 90000 00000</strong></p>
+                    <p>Email: <strong>medbreif9@gmail.com</strong></p>
+                    <p>WhatsApp: <strong>ye nahi btayenge</strong></p>
                 </div>
             </section>
         </div>
