@@ -115,7 +115,7 @@ const Reports = () => {
       }
 
       const res = await fetch(
-        `${API_BASE_URL}/api/reports/download/${reportId}/`,
+        `${API_BASE_URL}/download/${reportId}/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
