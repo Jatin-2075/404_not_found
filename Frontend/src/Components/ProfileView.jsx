@@ -70,7 +70,6 @@ const ProfileView = () => {
     } catch (err) {
       console.error("Fetch profile error:", err);
       toast.error("Failed to load profile");
-      navigate("/Profile_create");
     } finally {
       setLoading(false);
     }
