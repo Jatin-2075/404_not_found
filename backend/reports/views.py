@@ -110,7 +110,6 @@ class UploadReportView(APIView):
                     save=True
                 )
                 
-                # Clean up temporary file
                 try:
                     os.unlink(tmp.name)
                 except:

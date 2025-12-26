@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../../Style/login.css";
 import { API_BASE_URL } from "../../config/api";
-import { toast } from "react-toastify";
 
 const Login = () => {
-
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    
     const [showForgot, setShowForgot] = useState(false);
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
@@ -36,7 +34,11 @@ const Login = () => {
         }
     }, [timer, step]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        if (e) {
+            e.preventDefault();
+        }
+
         if (!username || !password) {
             toast.error("Please enter both username and password.");
             return;
@@ -56,27 +58,28 @@ const Login = () => {
                 }),
             });
 
-
             const data = await res.json();
 
-            if (data.success) {
+            if (!res.ok || !data.success) {
+                toast.error(data.msg || "Invalid login credentials.");
+                return;
+            }
 
+            if (data.tokens && data.tokens.access && data.tokens.refresh) {
                 localStorage.setItem("access_token", data.tokens.access);
                 localStorage.setItem("refresh_token", data.tokens.refresh);
+            }
 
+            if (data.user) {
                 localStorage.setItem("user", JSON.stringify(data.user));
+            }
 
-                
-                toast.success("Login successful!");
-                console.log(data)
+            toast.success("Login successful!");
 
-                if (data.user.profile_completed) {
-                    navigate("/Home");
-                } else {
-                    navigate("/Profile_create", { replace: true });
-                }
+            if (data.user && data.user.profile_completed) {
+                navigate("/Home");
             } else {
-                toast.error(data.msg || "Invalid login credentials.");
+                navigate("/Profile_create", { replace: true });
             }
         } catch (error) {
             console.error("Login error:", error);
@@ -113,14 +116,15 @@ const Login = () => {
 
             const data = await res.json();
 
-            if (data.success) {
-                toast.success("An OTP has been sent to your email.");
-                setStep(2);
-                setTimer(60);
-                setCanResend(false);
-            } else {
+            if (!res.ok || !data.success) {
                 toast.error(data.msg || "Unable to send OTP.");
+                return;
             }
+
+            toast.success("An OTP has been sent to your email.");
+            setStep(2);
+            setTimer(60);
+            setCanResend(false);
         } catch (error) {
             console.error("Send OTP error:", error);
             toast.error("Server error. Please try again later.");
@@ -128,7 +132,6 @@ const Login = () => {
             setLoading(false);
         }
     };
-
 
     const resetPassword = async () => {
         if (!otp || !newPassword) {
@@ -158,18 +161,20 @@ const Login = () => {
 
             const data = await res.json();
 
-            if (data.success) {
-                toast.success("Your password has been reset successfully.");
-
-                // Reset UI
-                setShowForgot(false);
-                setStep(1);
-                setEmail("");
-                setOtp("");
-                setNewPassword("");
-            } else {
+            if (!res.ok || !data.success) {
                 toast.error(data.msg || "Invalid OTP.");
+                return;
             }
+
+            toast.success("Your password has been reset successfully.");
+
+            setShowForgot(false);
+            setStep(1);
+            setEmail("");
+            setOtp("");
+            setNewPassword("");
+            setTimer(60);
+            setCanResend(false);
         } catch (error) {
             console.error("Reset password error:", error);
             toast.error("Server error. Please try again.");
@@ -178,17 +183,26 @@ const Login = () => {
         }
     };
 
-  
     const handleKeyPress = (e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !loading) {
             if (!showForgot) {
-                handleSubmit();
+                handleSubmit(e);
             } else if (step === 1) {
                 sendOtp();
             } else {
                 resetPassword();
             }
         }
+    };
+
+    const handleBackToLogin = () => {
+        setShowForgot(false);
+        setStep(1);
+        setTimer(60);
+        setCanResend(false);
+        setEmail("");
+        setOtp("");
+        setNewPassword("");
     };
 
     return (
@@ -199,25 +213,29 @@ const Login = () => {
                 {!showForgot && (
                     <>
                         <div className="login-field">
-                            <label>Username</label>
+                            <label htmlFor="username">Username</label>
                             <input
+                                id="username"
                                 type="text"
                                 placeholder="Enter your username"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 onKeyPress={handleKeyPress}
+                                disabled={loading}
                                 autoComplete="username"
                             />
                         </div>
 
                         <div className="login-field">
-                            <label>Password</label>
+                            <label htmlFor="password">Password</label>
                             <input
+                                id="password"
                                 type="password"
                                 placeholder="Enter your password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 onKeyPress={handleKeyPress}
+                                disabled={loading}
                                 autoComplete="current-password"
                             />
                         </div>
@@ -230,6 +248,11 @@ const Login = () => {
                                     fontSize: "14px",
                                 }}
                                 onClick={() => setShowForgot(true)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") setShowForgot(true);
+                                }}
                             >
                                 Forgot password?
                             </span>
@@ -239,6 +262,7 @@ const Login = () => {
                             className="login-btn"
                             onClick={handleSubmit}
                             disabled={loading}
+                            type="button"
                         >
                             {loading ? "Logging in..." : "Login"}
                         </button>
@@ -259,13 +283,15 @@ const Login = () => {
                         {step === 1 && (
                             <>
                                 <div className="login-field">
-                                    <label>Email</label>
+                                    <label htmlFor="forgot-email">Email</label>
                                     <input
+                                        id="forgot-email"
                                         type="email"
                                         placeholder="Enter your registered email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         onKeyPress={handleKeyPress}
+                                        disabled={loading}
                                         autoComplete="email"
                                     />
                                 </div>
@@ -274,6 +300,7 @@ const Login = () => {
                                     className="login-btn"
                                     onClick={sendOtp}
                                     disabled={loading}
+                                    type="button"
                                 >
                                     {loading ? "Sending OTP..." : "Send OTP"}
                                 </button>
@@ -283,25 +310,29 @@ const Login = () => {
                         {step === 2 && (
                             <>
                                 <div className="login-field">
-                                    <label>OTP</label>
+                                    <label htmlFor="otp">OTP</label>
                                     <input
+                                        id="otp"
                                         type="text"
                                         placeholder="Enter 6-digit OTP"
                                         value={otp}
                                         onChange={(e) => setOtp(e.target.value)}
                                         maxLength={6}
+                                        disabled={loading}
                                         autoComplete="off"
                                     />
                                 </div>
 
                                 <div className="login-field">
-                                    <label>New Password</label>
+                                    <label htmlFor="new-password">New Password</label>
                                     <input
+                                        id="new-password"
                                         type="password"
                                         placeholder="Enter new password (min 8 characters)"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                         onKeyPress={handleKeyPress}
+                                        disabled={loading}
                                         autoComplete="new-password"
                                     />
                                 </div>
@@ -310,6 +341,7 @@ const Login = () => {
                                     className="login-btn"
                                     onClick={resetPassword}
                                     disabled={loading}
+                                    type="button"
                                 >
                                     {loading ? "Resetting..." : "Reset Password"}
                                 </button>
@@ -324,6 +356,11 @@ const Login = () => {
                                                 fontWeight: 600,
                                             }}
                                             onClick={sendOtp}
+                                            role="button"
+                                            tabIndex={0}
+                                            onKeyPress={(e) => {
+                                                if (e.key === "Enter") sendOtp();
+                                            }}
                                         >
                                             Resend OTP
                                         </span>
@@ -339,14 +376,11 @@ const Login = () => {
                         <div className="login-footer">
                             <span
                                 style={{ cursor: "pointer", color: "#2a7be4" }}
-                                onClick={() => {
-                                    setShowForgot(false);
-                                    setStep(1);
-                                    setTimer(60);
-                                    setCanResend(false);
-                                    setEmail("");
-                                    setOtp("");
-                                    setNewPassword("");
+                                onClick={handleBackToLogin}
+                                role="button"
+                                tabIndex={0}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") handleBackToLogin();
                                 }}
                             >
                                 Back to login

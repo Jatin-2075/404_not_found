@@ -4,27 +4,18 @@ from datetime import timedelta
 from decouple import config
 import dj_database_url
 
-# ======================================================
-# BASE
-# ======================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY", default="_v#c)12#_+wfh2$$uoknksjyh)&fkvx@$57oadlyz7&7^j64*3")
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-# ======================================================
-# HOSTS
-# ======================================================
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".vercel.app", ".onrender.com"]
 
-RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default="medbrief-snq0.onrender.com")
+RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default="")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-# ======================================================
-# APPS
-# ======================================================
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -32,19 +23,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
-
+    'rest_framework_simplejwt.token_blacklist',
     "Login_Signup",
     "reports",
 ]
 
-# ======================================================
-# MIDDLEWARE
-# ======================================================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -59,9 +46,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "backend.urls"
 
-# ======================================================
-# TEMPLATES
-# ======================================================
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -80,10 +64,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-# ======================================================
-# DATABASE
-# ======================================================
-DATABASE_URL = config("DATABASE_URL", default= "postgresql://health_app_project_404_not_found_user:rLUWyGAPEL4zhEZ3MfHNQSOk5ahpwJVW@dpg-d54n33ngi27c73ed9eag-a.virginia-postgres.render.com:5432/health_app_project_404_not_found")
+DATABASE_URL = config("DATABASE_URL", default="")
 
 if DATABASE_URL:
     DATABASES = {
@@ -101,9 +82,6 @@ else:
         }
     }
 
-# ======================================================
-# AUTH / JWT
-# ======================================================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -117,29 +95,57 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,  # Add this
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# ======================================================
-# CORS + CSRF (VERCEL FRONTEND)
-# ======================================================
-FRONTEND_DOMAIN = "https://med-brief-h1s7.vercel.app"
+FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", default="https://med-brief-h1s7.vercel.app")
 
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
     FRONTEND_DOMAIN,
 ]
 
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
     FRONTEND_DOMAIN,
 ]
 
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
-# ======================================================
-# EMAIL
-# ======================================================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -148,9 +154,6 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = f"SmartZen <{EMAIL_HOST_USER}>"
 
-# ======================================================
-# STATIC & MEDIA
-# ======================================================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -166,9 +169,6 @@ STORAGES = {
     },
 }
 
-# ======================================================
-# SECURITY (PRODUCTION)
-# ======================================================
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -180,9 +180,9 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# ======================================================
-# MISC
-# ======================================================
+SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
+CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
+
 TIME_ZONE = "Asia/Kolkata"
 USE_TZ = True
 
@@ -191,9 +191,6 @@ LOGIN_URL = "/login/"
 
 API_NINJAS_KEY = config("API_NINJAS_KEY", default="")
 
-# ======================================================
-# LOGGING
-# ======================================================
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -212,16 +209,3 @@ LOGGING = {
         },
     },
 }
-
-'''
-    PYTHON_VERSION==3.10.13
-    SECRET_KEY=uqd=7=b*&6a$h55@y!o+r1paup07*g-14p!+h2d)(o)(#(q&-a
-    DEBUG=True
-    ALLOWED_HOSTS=127.0.0.1,localhost
-    FRONTEND_URL=https://med-brief-nine.vercel.app
-    EMAIL_HOST_USER=shivamprakashgami@gmail.com
-    EMAIL_HOST_PASSWORD=ovln rmuu kywv kcml
-    API_NINJAS_KEY=RoE+nmWZTPVUB34sKmFm7A==4WA1mMWA9bLQQsPp
-    DATABASE_URL=postgresql://health_app_project_404_not_found_user:rLUWyGAPEL4zhEZ3MfHNQSOk5ahpwJVW@dpg-d54n33ngi27c73ed9eag-a/health_app_project_404_not_found
-    
-    '''
