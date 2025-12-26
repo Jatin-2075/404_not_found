@@ -31,8 +31,8 @@ class Profile(models.Model):
     bloodgroup = models.CharField(max_length=10, null=True, blank=True)
     allergies = models.TextField(null=True, blank=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         ordering = ["-created_at"]
@@ -52,8 +52,8 @@ class Status(models.Model):
 
     profile_completed = models.BooleanField(default=False)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         verbose_name = "Status"
@@ -93,8 +93,8 @@ class PasswordResetOTP(models.Model):
 class ChatSession(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="chat_sessions")
     title = models.CharField(max_length=200, default="New Chat")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         ordering = ["-updated_at"]
