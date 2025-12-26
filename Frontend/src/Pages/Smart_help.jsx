@@ -20,7 +20,7 @@ const HandleSubmit = async () => {
             selected === "workout"
                 ? {
                       know: "workout",
-                      workout_level: WorkoutLevel, // ✅ FIXED KEY
+                      workout_level: WorkoutLevel, 
                   }
                 : {
                       know: "diet",
