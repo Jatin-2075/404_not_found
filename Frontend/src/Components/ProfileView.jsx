@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../Style/profile_view.css";
 import { API_BASE_URL } from "../config/api";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { API_BASE_URL } from "../config/api";
+
 
 const ProfileView = () => {
   const [profile, setProfile] = useState(null);

@@ -312,23 +312,20 @@ class ReportHistoryView(APIView):
 
 
 class DashboardView(APIView):
-    """
-    Get dashboard data including latest vitals and BMI trend
-    """
+    
     permission_classes = [IsAuthenticated]
+    
 
     def get(self, request):
-        """Retrieve dashboard analytics for authenticated user"""
+        print("USER:", request.user, "AUTH:", request.auth)
         
         try:
-            # Get last 6 reports for trends
             reports = list(
                 MedicalReport.objects
                 .filter(user=request.user)
                 .order_by("-uploaded_at")[:6]
             )
 
-            # Handle no reports case
             if not reports:
                 return Response(
                     {
