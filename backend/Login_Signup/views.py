@@ -149,7 +149,7 @@ def Profile_creation(request):
         logger.error(f"Profile creation error: {str(e)}")
         return Response({"success": False, "msg": "Failed to create profile"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(["GET"])
+@api_view(["GET","POST"])
 @permission_classes([IsAuthenticated])
 def Send_Profile(request):
     profile = Profile.objects.get(user=request.user)
