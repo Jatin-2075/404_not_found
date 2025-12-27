@@ -84,7 +84,7 @@ const ProfileView = () => {
     setSaving(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/profile/create/`, {
+      const res = await fetch(`${API_BASE_URL}/api/reports/profile/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
