@@ -35,7 +35,7 @@ const ProfileView = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/profile/get/`, {
+      const res = await fetch(`${API_BASE_URL}/profile/get/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
