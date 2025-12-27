@@ -7,10 +7,6 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# --------------------------------------------------
-# CORE SETTINGS
-# --------------------------------------------------
-
 SECRET_KEY = config(
     "SECRET_KEY",
     default="_v#c)12#_+wfh2$$uoknksjyh)&fkvx@$57oadlyz7&7^j64*3",
@@ -29,9 +25,6 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
-# --------------------------------------------------
-# APPLICATIONS
-# --------------------------------------------------
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -51,10 +44,6 @@ INSTALLED_APPS = [
 ]
 
 
-# --------------------------------------------------
-# MIDDLEWARE
-# --------------------------------------------------
-
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -68,36 +57,34 @@ MIDDLEWARE = [
 ]
 
 
-# --------------------------------------------------
-# URLS / WSGI
-# --------------------------------------------------
-
 ROOT_URLCONF = "backend.urls"
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# --------------------------------------------------
-# DATABASE (PRODUCTION SAFE)
-# --------------------------------------------------
 
-DATABASE_URL = config("DATABASE_URL", default=None)
+DATABASE_URL = config("DATABASE_URL", default="")
 
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL must be set in production")
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
+else:
+    if DEBUG:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
+    else:
+        raise RuntimeError("DATABASE_URL must be set in production")
 
-DATABASES = {
-    "default": dj_database_url.parse(
-        DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True,
-    )
-}
 
-
-# --------------------------------------------------
-# TEMPLATES
-# --------------------------------------------------
 
 TEMPLATES = [
     {
@@ -116,10 +103,6 @@ TEMPLATES = [
 ]
 
 
-# --------------------------------------------------
-# REST FRAMEWORK (SECURE DEFAULT)
-# --------------------------------------------------
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -136,33 +119,26 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", default="http://localhost:3000")
 
-
-# --------------------------------------------------
-# CORS / CSRF
-# --------------------------------------------------
-
-FRONTEND_DOMAIN = config(
-    "FRONTEND_DOMAIN",
-    default="https://med-brief-h1s7.vercel.app",
-)
-
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = config("CORS_ALLOW_ALL_ORIGINS", default=DEBUG, cast=bool)
+CORS_ALLOW_CREDENTIALS = True  
+CORS_ALLOWED_ORIGINS = []
+if not CORS_ALLOW_ALL_ORIGINS:
+    if FRONTEND_DOMAIN:
+        CORS_ALLOWED_ORIGINS.append(FRONTEND_DOMAIN)
+    if RENDER_EXTERNAL_HOSTNAME:
+        CORS_ALLOWED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://med-brief-h1s7.vercel.app",
 ]
-
+if FRONTEND_DOMAIN:
+    CSRF_TRUSTED_ORIGINS.append(FRONTEND_DOMAIN)
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
-
-# --------------------------------------------------
-# EMAIL
-# --------------------------------------------------
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -172,10 +148,6 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = f"SmartZen <{EMAIL_HOST_USER}>"
 
-
-# --------------------------------------------------
-# STATIC / MEDIA
-# --------------------------------------------------
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -192,23 +164,34 @@ STORAGES = {
     },
 }
 
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# --------------------------------------------------
-# SECURITY (RENDER SAFE)
-# --------------------------------------------------
+
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    if CORS_ALLOW_CREDENTIALS:
+        SESSION_COOKIE_SAMESITE = None
+        CSRF_COOKIE_SAMESITE = None
+    else:
+        SESSION_COOKIE_SAMESITE = "Lax"
+        CSRF_COOKIE_SAMESITE = "Lax"
 
-# --------------------------------------------------
-# TIMEZONE / DEFAULTS
-# --------------------------------------------------
+    SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = config("SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True, cast=bool)
+    SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", default=True, cast=bool)
+else:
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
 
 TIME_ZONE = "Asia/Kolkata"
 USE_TZ = True
@@ -216,17 +199,8 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/login/"
 
-
-# --------------------------------------------------
-# THIRD PARTY KEYS
-# --------------------------------------------------
-
 API_NINJAS_KEY = config("API_NINJAS_KEY", default="")
 
-
-# --------------------------------------------------
-# LOGGING
-# --------------------------------------------------
 
 LOGGING = {
     "version": 1,
