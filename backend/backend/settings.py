@@ -133,6 +133,7 @@ if not CORS_ALLOW_ALL_ORIGINS:
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
+    "https://med-brief-4hin.vercel.app",
 ]
 if FRONTEND_DOMAIN:
     CSRF_TRUSTED_ORIGINS.append(FRONTEND_DOMAIN)
