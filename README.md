@@ -1,6 +1,6 @@
 # 🏥 MedBrief
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20App-blue?style=for-the-badge&logo=vercel)](https://med-brief-h1s7.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20App-blue?style=for-the-badge&logo=vercel)](https://med-brief-4hin.vercel.app/)
 
 A full-stack health monitoring web application that allows users to upload medical reports, extract meaningful health data, and view structured insights through an interactive dashboard.
 
