@@ -23,11 +23,14 @@ const Reports = () => {
     })
       .then((res) => {
         if (!res.ok) throw new Error("Unauthorized");
+        console.log(res)
+        console.log("ye res h neech data h")
         return res.json();
       })
       .then((data) => {
         setReports(Array.isArray(data) ? data : []);
         setLoading(false);
+        console.log(data);
       })
       .catch(() => {
         setError("Failed to load reports");
