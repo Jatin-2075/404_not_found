@@ -70,12 +70,13 @@ const Home = () => {
       });
   }, [token]);
 
+  // Fixed chart data - extracting values and dates from bmi_trend array
   const chartData = {
-    labels: bmiTrend.map((_, index) => `Report ${index + 1}`),
+    labels: bmiTrend.map((item) => item.date || "N/A"),
     datasets: [
       {
         label: "BMI History",
-        data: bmiTrend,
+        data: bmiTrend.map((item) => item.value),
         fill: true,
         borderColor: "#4ade80",
         backgroundColor: "rgba(74, 222, 128, 0.1)",
@@ -83,6 +84,7 @@ const Home = () => {
         pointBackgroundColor: "#16a34a",
         pointBorderColor: "#fff",
         pointHoverRadius: 6,
+        pointRadius: 5,
       },
     ],
   };
@@ -91,15 +93,56 @@ const Home = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
+      legend: { 
+        display: true,
+        position: 'top',
+        labels: {
+          color: '#374151',
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `BMI: ${context.parsed.y}`;
+          }
+        }
+      }
     },
     scales: {
       y: {
         beginAtZero: false,
         grid: { color: "rgba(0, 0, 0, 0.05)" },
+        ticks: {
+          color: '#6b7280'
+        },
+        title: {
+          display: true,
+          text: 'BMI Value',
+          color: '#374151',
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        }
       },
       x: {
         grid: { display: false },
+        ticks: {
+          color: '#6b7280'
+        },
+        title: {
+          display: true,
+          text: 'Date',
+          color: '#374151',
+          font: {
+            size: 12,
+            weight: 'bold'
+          }
+        }
       },
     },
   };
