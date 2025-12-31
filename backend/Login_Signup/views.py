@@ -183,24 +183,55 @@ def Status_view(request):
 @permission_classes([IsAuthenticated])
 def Smart_Help(request):
     know = request.data.get("know")
+
     try:
         if know == "workout":
             level = request.data.get("workout_level")
+            if not level:
+                return Response(
+                    {"success": False, "msg": "Workout level is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            exercise_type = request.data.get("exercise_type")
+            result = func_workout(level, exercise_type)
+
         elif know == "diet":
             bmi = request.data.get("bmi")
             if bmi is None:
-                return Response({"success": False, "msg": "BMI is required"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"success": False, "msg": "BMI is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             result = diet_by_bmi(float(bmi))
+
         else:
-            return Response({"success": False, "msg": "Invalid service category"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"success": False, "msg": "Invalid service category"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not result.get("success"):
             return Response(result, status=status.HTTP_502_BAD_GATEWAY)
-        return Response({"success": True, "type": know, "data": result.get("data")})
+
+        return Response(
+            {"success": True, "type": know, "data": result.get("data")},
+            status=status.HTTP_200_OK
+        )
+
     except (ValueError, TypeError):
-        return Response({"success": False, "msg": "Invalid data types provided"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"success": False, "msg": "Invalid data types provided"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     except Exception as e:
         logger.critical(f"UNHANDLED VIEW ERROR: {str(e)}")
-        return Response({"success": False, "msg": "Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"success": False, "msg": "Internal Server Error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
