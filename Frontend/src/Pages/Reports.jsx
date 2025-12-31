@@ -25,6 +25,7 @@ const Reports = () => {
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/reports/history/`, {
+        method : "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
