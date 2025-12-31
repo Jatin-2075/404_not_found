@@ -23,22 +23,59 @@ const Reports = () => {
     })
       .then((res) => {
         if (!res.ok) throw new Error("Unauthorized");
-        console.log(res)
-        console.log("ye res h neech data h")
         return res.json();
       })
       .then((data) => {
-        setReports(Array.isArray(data) ? data : []);
+        console.log("API Response:", data);
+        // Backend returns: { success: true, count: 2, reports: [...] }
+        if (data.success && Array.isArray(data.reports)) {
+          setReports(data.reports);
+        } else {
+          setReports([]);
+        }
         setLoading(false);
-        console.log(data);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Fetch error:", err);
         setError("Failed to load reports");
         setReports([]);
         setLoading(false);
       });
   }, []);
 
+  const getStatusColor = (status) => {
+    const statusLower = status?.toLowerCase();
+    if (statusLower === "normal") return "normal";
+    if (statusLower === "critical") return "critical";
+    if (statusLower === "attention") return "attention";
+    return "unknown";
+  };
+
+  const handleShare = async (report) => {
+    const url = `${API_BASE_URL}/api/reports/download/${report.id}/`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Medical Report Summary",
+          text: `Medical Report: ${report.filename}`,
+          url: url,
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error("Share failed:", err);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Download link copied to clipboard!");
+      } catch (err) {
+        console.error("Copy failed:", err);
+        alert("Failed to copy link");
+      }
+    }
+  };
 
   return (
     <div className="reports-page-wrapper">
@@ -48,70 +85,88 @@ const Reports = () => {
           View and download your previously analyzed medical reports.
         </p>
 
-        {loading && <div className="reports-loading-state">Loading reports...</div>}
-        {error && <div className="reports-error-message">{error}</div>}
+        {loading && (
+          <div className="reports-loading-state">Loading reports...</div>
+        )}
 
-        {!loading && reports.length === 0 && (
+        {error && (
+          <div className="reports-error-message">{error}</div>
+        )}
+
+        {!loading && !error && reports.length === 0 && (
           <div className="reports-empty-state">
-            No reports uploaded yet.
+            No reports uploaded yet. Upload your first medical report to get started!
           </div>
         )}
 
-        <div className="reports-stack-list">
-          {Array.isArray(reports) && reports.map(
-            (report) => (
-            <div className="report-item-card" key={report.id}>
-              <div className="report-item-content">
-                <h3 className="report-item-filename">{report.filename}</h3>
-                <span className="report-item-date">{report.uploaded_at}</span>
-                <p className="report-item-summary">
-                  {report.final_conclusion || "No summary available"}
-                </p>
-              </div>
+        {!loading && !error && reports.length > 0 && (
+          <div className="reports-stack-list">
+            {reports.map((report) => (
+              <div className="report-item-card" key={report.id}>
+                <div className="report-item-content">
+                  <h3 className="report-item-filename">{report.filename}</h3>
+                  <span className="report-item-date">{report.uploaded_at}</span>
+                  
+                  {report.file_size_kb && (
+                    <span className="report-item-size">
+                      {report.file_size_kb} KB
+                    </span>
+                  )}
 
-              <div className="report-item-actions">
-                <span
-                  className={`status-pill-${report.status === "Normal"
-                      ? "normal"
-                      : "attention"
-                    }`}
-                >
-                  {report.status}
-                </span>
+                  <p className="report-item-summary">
+                    {report.final_conclusion || "No summary available"}
+                  </p>
 
-                <div className="report-action-group">
-                  <a
-                    href={`${API_BASE_URL}/api/reports/download/${report.id}/`}
-                    className="btn-download-action"
-                  >
-                    Download
-                  </a>
+                  {(report.bmi || report.respiratory_rate) && (
+                    <div className="report-vitals-preview">
+                      {report.bmi && (
+                        <span className="vital-badge">BMI: {report.bmi}</span>
+                      )}
+                      {report.respiratory_rate && (
+                        <span className="vital-badge">
+                          RR: {report.respiratory_rate}/min
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-                  <button
-                    className="btn-share-action"
-                    onClick={() => {
-                      const url = `${API_BASE_URL}/api/reports/download/${report.id}/`;
-                      if (navigator.share) {
-                        navigator.share({
-                          title: "Medical Report Summary",
-                          text: "Here is my medical report summary.",
-                          url: url,
-                        });
-                      } else {
-                        navigator.clipboard.writeText(url);
-                        alert("Download link copied to clipboard");
-                      }
-                    }}
-                  >
-                    Share
-                  </button>
+                <div className="report-item-actions">
+                  <span className={`status-pill-${getStatusColor(report.status)}`}>
+                    {report.status || "Unknown"}
+                  </span>
+
+                  <div className="report-action-group">
+                    {report.has_pdf && report.pdf_url ? (
+                      <a
+                        href={report.pdf_url}
+                        className="btn-download-action"
+                        download
+                      >
+                        Download PDF
+                      </a>
+                    ) : (
+                      <a
+                        href={`${API_BASE_URL}/api/reports/download/${report.id}/`}
+                        className="btn-download-action"
+                        download
+                      >
+                        Download
+                      </a>
+                    )}
+
+                    <button
+                      className="btn-share-action"
+                      onClick={() => handleShare(report)}
+                    >
+                      Share
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-          )}
-
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
