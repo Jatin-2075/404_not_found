@@ -183,19 +183,40 @@ def Status_view(request):
 @permission_classes([IsAuthenticated])
 def Smart_Help(request):
     know = request.data.get("know")
-
+    
+    # Debug: Log incoming request
+    logger.info(f"Incoming request - know: {know}, data: {request.data}")
+    
     try:
         if know == "workout":
             level = request.data.get("workout_level")
-            if not level:
+            
+            # More detailed validation
+            if not level or (isinstance(level, str) and level.strip() == ""):
+                logger.warning(f"Missing or empty workout_level. Received: '{level}'")
                 return Response(
-                    {"success": False, "msg": "Workout level is required"},
+                    {
+                        "success": False, 
+                        "msg": "workout_level is required",
+                        "received_keys": list(request.data.keys())  # Debug info
+                    },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
+            
+            # Validate level value
+            valid_levels = ["beginner", "intermediate", "expert"]
+            if level.lower() not in valid_levels:
+                return Response(
+                    {
+                        "success": False,
+                        "msg": f"Invalid workout_level. Must be one of: {', '.join(valid_levels)}"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             exercise_type = request.data.get("exercise_type")
-            result = func_workout(level, exercise_type)
-
+            result = func_workout(level.lower(), exercise_type)
+            
         elif know == "diet":
             bmi = request.data.get("bmi")
             if bmi is None:
@@ -203,36 +224,48 @@ def Smart_Help(request):
                     {"success": False, "msg": "BMI is required"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
-            result = diet_by_bmi(float(bmi))
-
+            
+            # Validate BMI range
+            try:
+                bmi_float = float(bmi)
+                if bmi_float <= 0 or bmi_float > 100:
+                    return Response(
+                        {"success": False, "msg": "BMI must be between 0 and 100"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                result = diet_by_bmi(bmi_float)
+            except ValueError:
+                return Response(
+                    {"success": False, "msg": "BMI must be a valid number"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
         else:
             return Response(
-                {"success": False, "msg": "Invalid service category"},
+                {"success": False, "msg": "Invalid service category. Use 'workout' or 'diet'"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
+            
         if not result.get("success"):
             return Response(result, status=status.HTTP_502_BAD_GATEWAY)
-
+            
         return Response(
             {"success": True, "type": know, "data": result.get("data")},
             status=status.HTTP_200_OK
         )
-
-    except (ValueError, TypeError):
+        
+    except (ValueError, TypeError) as e:
+        logger.error(f"Data type error: {str(e)}")
         return Response(
-            {"success": False, "msg": "Invalid data types provided"},
+            {"success": False, "msg": f"Invalid data types provided: {str(e)}"},
             status=status.HTTP_400_BAD_REQUEST
         )
-
     except Exception as e:
-        logger.critical(f"UNHANDLED VIEW ERROR: {str(e)}")
+        logger.critical(f"UNHANDLED VIEW ERROR: {str(e)}", exc_info=True)
         return Response(
             {"success": False, "msg": "Internal Server Error"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(["POST"])
