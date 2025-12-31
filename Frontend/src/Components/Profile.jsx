@@ -18,7 +18,7 @@ const Profile_Status = () => {
       }
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/reports/profile/status/`, {
+        const res = await fetch(`${API_BASE_URL}/profile/status/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -61,7 +61,6 @@ const Profile_Status = () => {
       onClick={handleClick}
       className={`medbrief-status-btn ${completed ? "is-completed" : "is-incomplete"}`}
       title={completed ? "View Profile" : "Complete Profile"}
-      aria-label={completed ? "View Profile" : "Complete Profile"}
     >
       <span className="status-icon">{completed ? "👤" : "⚠️"}</span>
       <span className="status-text">{completed ? "View Profile" : "Complete Profile"}</span>

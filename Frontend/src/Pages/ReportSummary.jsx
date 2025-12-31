@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import "../Style/reportsummary.css";
+import "../Style/reportSummary.css";
 import { API_BASE_URL } from "../config/api";
 
 const ReportSummary = () => {
@@ -140,50 +140,21 @@ const ReportSummary = () => {
 
         {!processing && reportId && (
           <div className="report-action-buttons">
-            <button
+            <a
+              href={`${API_BASE_URL}/api/reports/download/${reportId}/`}
               className="btn-download-pdf"
-              onClick={async () => {
-                const token = localStorage.getItem("access_token");
-
-                const res = await fetch(
-                  `${API_BASE_URL}/api/reports/download/${reportId}/`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
-                );
-
-                if (!res.ok) {
-                  alert("Download failed");
-                  return;
-                }
-
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
-
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "Medical_Report.pdf";
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-
-                window.URL.revokeObjectURL(url);
-              }}
             >
               Download PDF
-            </button>
-
+            </a>
 
             <button
               className="btn-share-report"
               onClick={() =>
                 navigator.share
                   ? navigator.share({
-                    title: "Medical Report Summary",
-                    url: `${API_BASE_URL}/api/reports/download/${reportId}/`,
-                  })
+                      title: "Medical Report Summary",
+                      url: `${API_BASE_URL}/api/reports/download/${reportId}/`,
+                    })
                   : alert("Sharing not supported")
               }
             >

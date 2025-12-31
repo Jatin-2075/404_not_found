@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../Style/smarthelp.css";
+import "../Style/SmartHelp.css";
 import { API_BASE_URL } from "../config/api";
 
 const Smart_help = () => {
@@ -11,58 +11,52 @@ const Smart_help = () => {
     const [loading, setLoading] = useState(false);
 
     const accessToken = localStorage.getItem("access_token");
-const HandleSubmit = async () => {
-    if (!selected) return alert("Please select an option first.");
-    setLoading(true);
 
-    try {
-        const payload =
-            selected === "workout"
-                ? {
-                      know: "workout",
-                      workout_level: WorkoutLevel, 
-                  }
-                : {
-                      know: "diet",
-                      bmi: BMI,
-                  };
+    const HandleSubmit = async () => {
+        if (!selected) return alert("Please select an option first.");
+        setLoading(true);
 
-        const res = await fetch(`${API_BASE_URL}/smart-help/`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
+        try {
+            const res = await fetch(`${API_BASE_URL}/Smart_Help/`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    know: selected,
+                    Workoutlevel: WorkoutLevel,
+                    bmi: BMI,
+                })
+            });
 
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server crashed and sent an HTML error page.");
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Server crashed and sent an HTML error page.");
+            }
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                alert(data.msg || "An error occurred on the server.");
+                return;
+            }
+
+            if (data.type === "workout") {
+                SetWorkoutData(data);
+                setDietData(null);
+            } else if (data.type === "diet") {
+                setDietData(data.data);
+                SetWorkoutData({});
+            }
+
+        } catch (err) {
+            console.error("Frontend Critical Error:", err);
+            alert("Failed to communicate with the server.");
+        } finally {
+            setLoading(false);
         }
-
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-            alert(data.msg || "An error occurred on the server.");
-            return;
-        }
-
-        if (data.type === "workout") {
-            SetWorkoutData(data);   // ✅ FIXED
-            setDietData(null);
-        } else if (data.type === "diet") {
-            setDietData(data.data);
-            SetWorkoutData({});
-        }
-    } catch (err) {
-        console.error("Frontend Critical Error:", err);
-        alert("Failed to communicate with the server.");
-    } finally {
-        setLoading(false);
-    }
-};
-
+    };
 
     return (
         <div className="smart-help-container">
@@ -142,16 +136,13 @@ const HandleSubmit = async () => {
                         </div>
                     )}
 
-                    {DietData && Array.isArray(DietData.foods) && (
+                    {DietData && (
                         <div className="sh-result-grid fade-up">
                             <h2 className="section-label">Nutrition Strategy: {DietData.goal}</h2>
-                            <div className="bmi-meter">
-                                Current BMI: <span>{DietData.bmi}</span>
-                            </div>
-
+                            <div className="bmi-meter">Current BMI: <span>{DietData.bmi}</span></div>
                             <div className="diet-grid">
                                 {DietData.foods.slice(0, 5).map((food, index) => (
-                                    <div className="sh-card anim-delay" key={index}>
+                                    <div className="sh-card anim-delay" key={index} style={{ "--i": index }}>
                                         <h4>{food.name}</h4>
                                         <div className="macro-stats">
                                             <span>🔥 {food.calories} cal</span>

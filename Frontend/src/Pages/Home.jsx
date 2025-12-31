@@ -8,7 +8,6 @@ import {
   checkRespiratoryRate,
 } from "../Components/customChecks";
 
-import { API_BASE_URL } from "../config/api";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -41,15 +40,15 @@ const Home = () => {
 
   const normalRanges = {
     bp: "120/80",
-    bmi: "18.5 - 24.9",
-    respiratory_rate: "12 - 20 /min",
-    heartRate: "60 - 100 bpm",
+    bmi: "18.5 – 24.9",
+    respiratory_rate: "12 – 20 /min",
+    heartRate: "60 – 100 bpm",
   };
 
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/reports/dashboard/`, {
+    fetch("http://127.0.0.1:8000/api/reports/dashboard/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
