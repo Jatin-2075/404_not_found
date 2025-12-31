@@ -66,13 +66,15 @@ const ProfileView = () => {
       });
 
       const data = await res.json();
+      console.log(data);
       if (data.success) {
         toast.success("Profile updated");
         setIsEditing(false);
         fetchProfile();
       }
-    } catch {
+    } catch(err) {
       toast.error("Update failed");
+      console.log(err)
     } finally {
       setSaving(false);
     }
