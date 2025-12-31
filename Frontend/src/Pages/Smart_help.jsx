@@ -25,9 +25,10 @@ const Smart_help = () => {
                 },
                 body: JSON.stringify({
                     know: selected,
-                    Workoutlevel: WorkoutLevel,
+                    workout_level: WorkoutLevel, // ✅ FIXED
                     bmi: BMI,
                 })
+
             });
 
             const contentType = res.headers.get("content-type");
@@ -116,7 +117,7 @@ const Smart_help = () => {
                     </button>
                 </div>
 
-           
+
                 <div className="sh-results-container">
                     {WorkoutData?.data && Array.isArray(WorkoutData.data) && (
                         <div className="sh-result-grid fade-up">
