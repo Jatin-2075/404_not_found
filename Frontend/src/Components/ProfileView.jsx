@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import "../Style/profile_view.css";
 import { API_BASE_URL } from "../config/api";
 
-
 const ProfileView = () => {
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -25,11 +24,6 @@ const ProfileView = () => {
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    if (!token) {
-      toast.error("Please login to view profile");
-      navigate("/Login");
-      return;
-    }
     fetchProfile();
   }, []);
 
@@ -38,18 +32,6 @@ const ProfileView = () => {
       const res = await fetch(`${API_BASE_URL}/profile/get/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (res.status === 401) {
-        toast.error("Session expired. Please login again");
-        localStorage.clear();
-        navigate("/Login");
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch profile");
-      }
-
       const data = await res.json();
 
       if (!data.success) {
@@ -58,33 +40,23 @@ const ProfileView = () => {
       }
 
       setProfile(data);
-      setFormData({
-        name: data.name || "",
-        age: data.age || "",
-        gender: data.gender || "",
-        weight: data.weight || "",
-        height: data.height || "",
-        bloodgroup: data.bloodgroup || "",
-        allergies: data.allergies || "",
-      });
-    } catch (err) {
-      console.error("Fetch profile error:", err);
+      setFormData({ ...data });
+    } catch {
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/profile/create/`, {
+      const res = await fetch(`${BASE_URL}/profile/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,41 +65,21 @@ const ProfileView = () => {
         body: JSON.stringify(formData),
       });
 
-      if (res.status === 401) {
-        toast.error("Session expired. Please login again");
-        localStorage.clear();
-        navigate("/Login");
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error("Failed to save profile");
-      }
-
       const data = await res.json();
-
       if (data.success) {
-        toast.success("Profile updated successfully");
+        toast.success("Profile updated");
         setIsEditing(false);
-        await fetchProfile();
-      } else {
-        toast.error(data.msg || "Failed to update profile");
+        fetchProfile();
       }
-    } catch (err) {
-      console.error("Save profile error:", err);
-      toast.error("Update failed. Please try again.");
+    } catch {
+      toast.error("Update failed");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return <div className="loading">Loading profile...</div>;
-  }
+  if (loading) return <div className="loading">Loading...</div>;
 
-  if (!profile) {
-    return <div className="loading">No profile data available</div>;
-  }
   return (
     <div className="profile-page">
       <div className="profile-container">
