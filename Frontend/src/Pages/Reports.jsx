@@ -16,7 +16,7 @@ const Reports = () => {
       return;
     }
 
-    fetch(`${API_BASE_URL}api/reports/history/`, {
+    fetch(`${API_BASE_URL}/api/reports/history/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
